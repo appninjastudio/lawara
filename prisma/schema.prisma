@@ -1,0 +1,182 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("user") // admin, user, viewer
+  phone     String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cases        Case[]        @relation("CreatedBy")
+  transactions Transaction[]
+  notes        CaseNote[]
+  postItNotes  PostItNote[]
+}
+
+model Debtor {
+  id        Int      @id @default(autoincrement())
+  tcNo      String   @unique
+  firstName String
+  lastName  String
+  phone     String?
+  email     String?
+  address   String?
+  city      String?
+  district  String?
+  birthDate DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cases Case[]
+}
+
+model Creditor {
+  id        Int      @id @default(autoincrement())
+  name      String
+  taxNumber String?
+  type      String   @default("company") // individual, company, bank
+  phone     String?
+  email     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cases Case[]
+}
+
+model Court {
+  id       Int    @id @default(autoincrement())
+  name     String
+  city     String
+  district String
+  type     String @default("icra") // icra, mahkeme
+  uyapCode String?
+
+  cases Case[]
+}
+
+model Case {
+  id              Int      @id @default(autoincrement())
+  caseNumber      String   @unique
+  foyNumber       String?
+  debtorId        Int
+  creditorId      Int
+  courtId         Int
+  principalAmount Float
+  interestAmount  Float    @default(0)
+  totalAmount     Float
+  caseType        String   @default("ilamsiz") // ilamli, ilamsiz, kambiyo
+  status          String   @default("active") // active, pending, completed, closed, warning
+  openDate        DateTime @default(now())
+  closeDate       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdById     Int
+
+  debtor       Debtor       @relation(fields: [debtorId], references: [id])
+  creditor     Creditor     @relation(fields: [creditorId], references: [id])
+  court        Court        @relation(fields: [courtId], references: [id])
+  createdBy    User         @relation("CreatedBy", fields: [createdById], references: [id])
+  transactions Transaction[]
+  commitments  Commitment[]
+  notes        CaseNote[]
+  notifications CaseNotification[]
+}
+
+model Transaction {
+  id              Int      @id @default(autoincrement())
+  caseId          Int
+  type            String   // income, expense
+  amount          Float
+  description     String
+  transactionDate DateTime @default(now())
+  createdAt       DateTime @default(now())
+  createdById     Int
+
+  case      Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  createdBy User @relation(fields: [createdById], references: [id])
+}
+
+model Commitment {
+  id               Int      @id @default(autoincrement())
+  caseId           Int
+  totalAmount      Float
+  installmentCount Int
+  paidCount        Int      @default(0)
+  status           String   @default("active") // active, completed, violated
+  startDate        DateTime @default(now())
+  nextPaymentDate  DateTime?
+  nextPaymentAmount Float?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  case         Case                   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  installments CommitmentInstallment[]
+}
+
+model CommitmentInstallment {
+  id                Int      @id @default(autoincrement())
+  commitmentId      Int
+  installmentNumber Int
+  amount            Float
+  dueDate           DateTime
+  paidDate          DateTime?
+  status            String   @default("pending") // pending, paid, overdue
+
+  commitment Commitment @relation(fields: [commitmentId], references: [id], onDelete: Cascade)
+}
+
+model CaseNote {
+  id        Int      @id @default(autoincrement())
+  caseId    Int
+  userId    Int
+  content   String
+  type      String   @default("note") // note, warning, reminder
+  createdAt DateTime @default(now())
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+}
+
+model PostItNote {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String
+  content   String
+  color     String   @default("yellow") // yellow, blue, pink, green, purple
+  caseId    String?  // optional case reference like "GENEL - 1141"
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model CaseNotification {
+  id          Int      @id @default(autoincrement())
+  caseId      Int
+  type        String   // tebligat, sms, email, call
+  recipient   String
+  content     String
+  status      String   @default("pending") // pending, sent, delivered, failed
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  pttBarcode  String?
+  createdAt   DateTime @default(now())
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}
