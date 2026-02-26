@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'icramatik-secret-key-change-in-production'
+  process.env.JWT_SECRET || 'lawara-secret-key-change-in-production'
 );
 
 const PUBLIC_PATHS = ['/login', '/api/auth/login'];
@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get('icramatik-token')?.value;
+  const token = request.cookies.get('lawara-token')?.value;
 
   if (!token) {
     // API routes return 401, pages redirect to login
@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.json({ error: 'Geçersiz oturum' }, { status: 401 });
     }
     const response = NextResponse.redirect(new URL('/login', request.url));
-    response.cookies.delete('icramatik-token');
+    response.cookies.delete('lawara-token');
     return response;
   }
 }

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { createToken, getTokenCookieOptions } from '@/lib/auth';
-import bcrypt from 'bcryptjs';
+
+const DEMO_USERS = [
+  { id: 1, email: 'admin@lawara.co', password: 'admin123', name: 'Talip Furkan Doğan', role: 'admin' },
+  { id: 2, email: 'demo@lawara.co', password: 'demo123', name: 'Demo Kullanıcı', role: 'user' },
+];
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,24 +17,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = DEMO_USERS.find(u => u.email === email && u.password === password);
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Geçersiz e-posta veya şifre' },
-        { status: 401 }
-      );
-    }
-
-    // Check password - support both hashed and plain text (for seed data)
-    let validPassword = false;
-    if (user.password.startsWith('$2')) {
-      validPassword = await bcrypt.compare(password, user.password);
-    } else {
-      validPassword = user.password === password;
-    }
-
-    if (!validPassword) {
       return NextResponse.json(
         { error: 'Geçersiz e-posta veya şifre' },
         { status: 401 }

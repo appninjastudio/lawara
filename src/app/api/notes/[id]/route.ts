@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
 export async function PUT(
   request: NextRequest,
@@ -7,20 +6,8 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const noteId = parseInt(id);
     const body = await request.json();
-
-    const note = await prisma.postItNote.update({
-      where: { id: noteId },
-      data: {
-        ...(body.title !== undefined && { title: body.title.trim() }),
-        ...(body.content !== undefined && { content: body.content.trim() }),
-        ...(body.color !== undefined && { color: body.color }),
-        ...(body.caseId !== undefined && { caseId: body.caseId || null }),
-        ...(body.pinned !== undefined && { pinned: body.pinned }),
-      },
-    });
-
+    const note = { id: parseInt(id), ...body, updatedAt: new Date().toISOString() };
     return NextResponse.json({ success: true, data: note });
   } catch (error) {
     console.error('PostIt PUT Error:', error);
@@ -33,11 +20,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const noteId = parseInt(id);
-
-    await prisma.postItNote.delete({ where: { id: noteId } });
-
+    await params;
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('PostIt DELETE Error:', error);

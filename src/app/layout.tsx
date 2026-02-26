@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "IcraMatik Hybrid - LegalTech Dashboard",
+  title: "Lawara - LegalTech Dashboard",
   description: "Modern icra takip ve hukuk yönetim sistemi",
 };
 

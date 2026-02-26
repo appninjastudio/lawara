@@ -50,8 +50,8 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/30 mb-4">
             <Scale className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white">İcraMatik</h1>
-          <p className="text-blue-300/70 mt-1">İcra Takip Yönetim Sistemi</p>
+          <h1 className="text-3xl font-bold text-white">Lawara</h1>
+          <p className="text-blue-300/70 mt-1">Hukuk Yönetim Sistemi</p>
         </div>
 
         {/* Login Card */}
@@ -75,7 +75,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="ornek@icramatik.com"
+                placeholder="admin@lawara.co"
                 required
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-blue-300/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
@@ -118,22 +118,10 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
-            <p className="text-xs font-medium text-blue-300/70 mb-2">Demo Giriş Bilgileri:</p>
-            <div className="space-y-1">
-              <p className="text-xs text-blue-200/60">
-                <span className="text-blue-300/80 font-medium">E-posta:</span> talipfurkan@icramatik.com
-              </p>
-              <p className="text-xs text-blue-200/60">
-                <span className="text-blue-300/80 font-medium">Şifre:</span> admin123
-              </p>
-            </div>
-          </div>
         </div>
 
         <p className="text-center text-blue-300/30 text-xs mt-6">
-          İcraMatik v1.0 &copy; 2024
+          Lawara v1.0 &copy; 2024
         </p>
       </div>
     </div>

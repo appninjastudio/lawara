@@ -22,10 +22,10 @@ async function main() {
 
   // ── Users ──
   const admin = await prisma.user.create({
-    data: { email: 'talipfurkan@icramatik.com', name: 'Talip Furkan Doğan', password: 'admin123', role: 'admin', phone: '+90 532 123 45 67' },
+    data: { email: 'talipfurkan@lawara.co', name: 'Talip Furkan Doğan', password: 'admin123', role: 'admin', phone: '+90 532 123 45 67' },
   });
   const user2 = await prisma.user.create({
-    data: { email: 'yuksel@icramatik.com', name: 'Yüksel Martı', password: 'user123', role: 'user', phone: '+90 533 987 65 43' },
+    data: { email: 'yuksel@lawara.co', name: 'Yüksel Martı', password: 'user123', role: 'user', phone: '+90 533 987 65 43' },
   });
 
   // ── Courts ──

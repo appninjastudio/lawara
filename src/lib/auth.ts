@@ -2,10 +2,10 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'icramatik-secret-key-change-in-production'
+  process.env.JWT_SECRET || 'lawara-secret-key-change-in-production'
 );
 
-const COOKIE_NAME = 'icramatik-token';
+const COOKIE_NAME = 'lawara-token';
 
 export interface AuthUser {
   id: number;

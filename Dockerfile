@@ -1,4 +1,4 @@
-# IcraMatik Hybrid - Production Dockerfile
+# Lawara - Production Dockerfile
 # Optimized multi-stage build for minimal image size
 
 # Stage 1: Dependencies

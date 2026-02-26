@@ -95,7 +95,7 @@ export default function Sidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="font-bold text-lg tracking-tight">IcraMatik</span>
+              <span className="font-bold text-lg tracking-tight">Lawara</span>
               <span className="text-xs text-slate-400">Hybrid</span>
             </div>
           )}

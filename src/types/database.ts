@@ -1,5 +1,5 @@
 // Database Types for SQL Server Integration
-// These types match the IcraMatik database schema
+// These types match the Lawara database schema
 
 export interface Case {
   id: number;

@@ -114,7 +114,7 @@ export default function FinancePage() {
       ihtarname: `İHTARNAME
 
 Tarih: ${today}
-İhtar Eden: IcraMatik Hukuk Bürosu
+İhtar Eden: Lawara Hukuk Bürosu
 Muhatap: ${commitment.debtor}
 Konu: Taahhüt İhlali Nedeniyle İhtar
 
@@ -131,12 +131,12 @@ ${commitment.caseId} sayılı icra dosyası kapsamında, ${formatCurrency(commit
 hususlarını ihtar ederiz.
 
 Saygılarımızla,
-IcraMatik Hukuk Bürosu
+Lawara Hukuk Bürosu
 Av. Talip Furkan Doğan`,
 
       dava_dilekce: `CEZA MAHKEMESİ SAYIN HAKİMLİĞİ'NE
 
-DAVACI (ŞİKAYETÇİ): IcraMatik Hukuk Bürosu
+DAVACI (ŞİKAYETÇİ): Lawara Hukuk Bürosu
 VEKİLİ: Av. Talip Furkan Doğan
 SANIK: ${commitment.debtor}
 SUÇ: Taahhüdü İhlal (İİK m.340)
@@ -229,7 +229,7 @@ Av. Talip Furkan Doğan`,
       ozet_rapor: `İHLAL ÖZET RAPORU
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Rapor Tarihi: ${today}
-Hazırlayan: IcraMatik Hukuk Bürosu
+Hazırlayan: Lawara Hukuk Bürosu
 
 DOSYA BİLGİLERİ:
 • Dosya No      : ${commitment.caseId}
@@ -261,7 +261,7 @@ RİSK DEĞERLENDİRMESİ:
 ${'█'.repeat(Math.round((1 - commitment.paidCount / commitment.installmentCount) * 10))}${'░'.repeat(Math.round((commitment.paidCount / commitment.installmentCount) * 10))} ${Math.round((1 - commitment.paidCount / commitment.installmentCount) * 100)}% Risk
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Bu rapor IcraMatik sistemi tarafından otomatik oluşturulmuştur.`,
+Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
     };
     return drafts[type] || 'Rapor türü bulunamadı.';
   };

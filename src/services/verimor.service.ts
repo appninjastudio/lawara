@@ -30,7 +30,7 @@ class VerimorService {
     this.config = {
       apiId: process.env.VERIMOR_API_ID || '',
       apiKey: process.env.VERIMOR_API_KEY || '',
-      sourceAddr: process.env.VERIMOR_SOURCE_ADDR || 'ICRAMATIK',
+      sourceAddr: process.env.VERIMOR_SOURCE_ADDR || 'LAWARA',
       callerId: process.env.VERIMOR_CALLER_ID,
       baseUrl: process.env.VERIMOR_BASE_URL || 'https://api.bulutsantralim.com',
     };

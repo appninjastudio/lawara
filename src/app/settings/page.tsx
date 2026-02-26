@@ -41,8 +41,8 @@ export default function SettingsPage() {
   });
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [saving, setSaving] = useState(false);
-  const [profileForm, setProfileForm] = useState({ name: 'Talip Furkan Doğan', email: 'talipfurkan@icramatik.com', phone: '+90 532 123 45 67', location: 'İstanbul, Türkiye' });
-  const [companyForm, setCompanyForm] = useState({ name: 'IcraMatik Hukuk Bürosu', taxNo: '1234567890', taxOffice: 'Beşiktaş', address: 'Levent Mah. Büyükdere Cad. No:123 Kat:5 Beşiktaş/İstanbul' });
+  const [profileForm, setProfileForm] = useState({ name: 'Talip Furkan Doğan', email: 'talipfurkan@lawara.co', phone: '+90 532 123 45 67', location: 'İstanbul, Türkiye' });
+  const [companyForm, setCompanyForm] = useState({ name: 'Lawara Hukuk Bürosu', taxNo: '1234567890', taxOffice: 'Beşiktaş', address: 'Levent Mah. Büyükdere Cad. No:123 Kat:5 Beşiktaş/İstanbul' });
   const [passwordForm, setPasswordForm] = useState({ current: '', newPass: '', confirm: '' });
   const [twoFAEnabled, setTwoFAEnabled] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState('light');
@@ -85,7 +85,7 @@ export default function SettingsPage() {
     setSaving(true);
     await new Promise(r => setTimeout(r, 1500));
     setSaving(false);
-    showToast('Yedekleme tamamlandı - icramatik-backup-' + new Date().toISOString().slice(0, 10) + '.db');
+    showToast('Yedekleme tamamlandı - lawara-backup-' + new Date().toISOString().slice(0, 10) + '.db');
   };
 
   const handleExport = () => {
@@ -94,7 +94,7 @@ export default function SettingsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `icramatik-export-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `lawara-export-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     showToast('Veriler dışa aktarıldı');
@@ -149,7 +149,7 @@ export default function SettingsPage() {
                   <div>
                     <h3 className="text-lg font-semibold text-slate-900">Talip Furkan Doğan</h3>
                     <p className="text-sm text-slate-500">Administrator</p>
-                    <p className="text-sm text-blue-600 mt-1">talipfurkan@icramatik.com</p>
+                    <p className="text-sm text-blue-600 mt-1">talipfurkan@lawara.co</p>
                   </div>
                 </div>
 

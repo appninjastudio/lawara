@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
 
 export async function POST(
   request: NextRequest,
@@ -8,27 +6,21 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const caseId = parseInt(id);
     const body = await request.json();
 
     if (!body.content?.trim()) {
       return NextResponse.json({ error: 'Not içeriği zorunludur' }, { status: 400 });
     }
 
-    const session = await getSession();
-    const userId = session?.id || (await prisma.user.findFirst())?.id || 1;
-
-    const note = await prisma.caseNote.create({
-      data: {
-        caseId,
-        userId,
-        content: body.content.trim(),
-        type: body.type || 'note',
-      },
-      include: {
-        user: { select: { id: true, name: true } },
-      },
-    });
+    const note = {
+      id: Date.now(),
+      caseId: parseInt(id),
+      userId: 1,
+      content: body.content.trim(),
+      type: body.type || 'note',
+      createdAt: new Date().toISOString(),
+      user: { id: 1, name: 'Talip Furkan Doğan' },
+    };
 
     return NextResponse.json({ success: true, data: note });
   } catch (error) {
