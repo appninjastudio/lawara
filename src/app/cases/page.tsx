@@ -69,6 +69,10 @@ export default function CasesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [queryCriteria, setQueryCriteria] = useState('borclu_adi');
+  const [queryValue, setQueryValue] = useState('');
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(true);
+  const [activeFilters, setActiveFilters] = useState<{criteria: string; value: string; label: string}[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [showNewCaseModal, setShowNewCaseModal] = useState(false);
   const [lookups, setLookups] = useState<{
@@ -275,56 +279,187 @@ export default function CasesPage() {
       <Header title="Dosya Takibi" subtitle="Tüm icra dosyalarını yönetin" />
       
       <div className="flex-1 p-6 space-y-6">
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="relative flex-1 sm:flex-initial">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Dosya no, borçlu veya alacaklı ara..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full sm:w-80 pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
-            </div>
-            <div className="relative">
-              <button
-                onClick={() => setShowFilterMenu(!showFilterMenu)}
-                className={clsx(
-                  'flex items-center gap-2 px-4 py-2.5 bg-white border rounded-xl text-sm font-medium transition-colors',
-                  statusFilter ? 'border-blue-400 text-blue-700' : 'border-slate-200 text-slate-700 hover:bg-slate-50'
-                )}
-              >
-                <Filter className="w-4 h-4" />
-                <span className="hidden sm:inline">{statusFilter ? statusConfig[statusFilter as keyof typeof statusConfig]?.label : 'Filtrele'}</span>
-              </button>
-              {showFilterMenu && (
-                <div className="absolute top-full mt-2 left-0 bg-white border border-slate-200 rounded-xl shadow-lg z-20 py-1 w-40">
-                  <button onClick={() => { setStatusFilter(''); setShowFilterMenu(false); setPage(1); }} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50">Tümü</button>
-                  {Object.entries(statusConfig).map(([key, val]) => (
-                    <button key={key} onClick={() => { setStatusFilter(key); setShowFilterMenu(false); setPage(1); }} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50">{val.label}</button>
-                  ))}
-                </div>
-              )}
+        {/* Sorgulama Paneli */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-slate-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-indigo-600" />
+                <h3 className="font-semibold text-slate-900">Sorgulama</h3>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Dışa Aktar</span>
+                </button>
+                <button
+                  onClick={openNewCaseModal}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-sm font-medium text-white hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Yeni Dosya</span>
+                </button>
+              </div>
             </div>
           </div>
-          
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleExportCSV}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Dışa Aktar</span>
-            </button>
-            <button
-              onClick={openNewCaseModal}
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-sm font-medium text-white hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Yeni Dosya</span>
-            </button>
+
+          <div className="p-4">
+            <div className="flex flex-col md:flex-row gap-3 items-end">
+              {/* Sorgu Kriteri Seç */}
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Sorgu Kriteri Seç</label>
+                <select
+                  value={queryCriteria}
+                  onChange={(e) => setQueryCriteria(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none cursor-pointer"
+                >
+                  <option value="borclu_adi">Borçlu Adı</option>
+                  <option value="borclu_tc">TCKN</option>
+                  <option value="dosya_no">Dosya Numarası</option>
+                  <option value="foy_no">Föy Numarası</option>
+                  <option value="alacakli">Alacaklı / Müvekkil Adı</option>
+                  <option value="icra_dairesi">İcra Müdürlüğü</option>
+                  <option value="dosya_durumu">Dosya Durumu</option>
+                  <option value="takip_turu">Takip Türü</option>
+                  <option value="klasor_no">Klasör Numarası</option>
+                  <option value="sistem_no">Sistem No</option>
+                  <option value="talimat_no">Talimat No</option>
+                  <option value="talimat_mudurlugu">Talimat Müdürlüğü</option>
+                  <option value="takip_acilis">Takip Açılış Tarihi</option>
+                  <option value="hazirlayan">Takibi Hazırlayan Kullanıcı</option>
+                </select>
+              </div>
+
+              {/* Sorgulanan Kelime */}
+              <div className="flex-[2] min-w-[280px]">
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Sorgulanan Kelime</label>
+                {queryCriteria === 'dosya_durumu' ? (
+                  <select
+                    value={queryValue}
+                    onChange={(e) => setQueryValue(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  >
+                    <option value="">Tüm Durumlar</option>
+                    <option value="active">Aktif</option>
+                    <option value="pending">Beklemede</option>
+                    <option value="completed">Tamamlandı</option>
+                    <option value="warning">Dikkat</option>
+                  </select>
+                ) : queryCriteria === 'takip_turu' ? (
+                  <select
+                    value={queryValue}
+                    onChange={(e) => setQueryValue(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  >
+                    <option value="">Tüm Türler</option>
+                    <option value="ilamsiz">İlamsız</option>
+                    <option value="ilamli">İlamlı</option>
+                    <option value="kambiyo">Kambiyo</option>
+                  </select>
+                ) : queryCriteria === 'takip_acilis' ? (
+                  <input
+                    type="date"
+                    value={queryValue}
+                    onChange={(e) => setQueryValue(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={queryValue}
+                    onChange={(e) => setQueryValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        setSearchInput(queryValue);
+                        if (queryCriteria === 'dosya_durumu') setStatusFilter(queryValue);
+                        const criteriaLabels: Record<string, string> = {
+                          borclu_adi: 'Borçlu Adı', borclu_tc: 'TCKN', dosya_no: 'Dosya No', foy_no: 'Föy No',
+                          alacakli: 'Alacaklı', icra_dairesi: 'İcra Müdürlüğü', dosya_durumu: 'Durum',
+                          takip_turu: 'Takip Türü', klasor_no: 'Klasör No', sistem_no: 'Sistem No',
+                          talimat_no: 'Talimat No', talimat_mudurlugu: 'Talimat Müdürlüğü',
+                          takip_acilis: 'Açılış Tarihi', hazirlayan: 'Hazırlayan',
+                        };
+                        if (queryValue.trim()) {
+                          setActiveFilters(prev => [...prev.filter(f => f.criteria !== queryCriteria), { criteria: queryCriteria, value: queryValue, label: criteriaLabels[queryCriteria] || queryCriteria }]);
+                        }
+                        setPage(1);
+                      }
+                    }}
+                    placeholder="Sorgulanacak içeriği giriniz..."
+                    className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  />
+                )}
+              </div>
+
+              {/* Sorgula Butonu */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setSearchInput(queryValue);
+                    if (queryCriteria === 'dosya_durumu') setStatusFilter(queryValue);
+                    else if (queryCriteria === 'takip_turu') setStatusFilter('');
+                    const criteriaLabels: Record<string, string> = {
+                      borclu_adi: 'Borçlu Adı', borclu_tc: 'TCKN', dosya_no: 'Dosya No', foy_no: 'Föy No',
+                      alacakli: 'Alacaklı', icra_dairesi: 'İcra Müdürlüğü', dosya_durumu: 'Durum',
+                      takip_turu: 'Takip Türü', klasor_no: 'Klasör No', sistem_no: 'Sistem No',
+                      talimat_no: 'Talimat No', talimat_mudurlugu: 'Talimat Müdürlüğü',
+                      takip_acilis: 'Açılış Tarihi', hazirlayan: 'Hazırlayan',
+                    };
+                    if (queryValue.trim()) {
+                      setActiveFilters(prev => [...prev.filter(f => f.criteria !== queryCriteria), { criteria: queryCriteria, value: queryValue, label: criteriaLabels[queryCriteria] || queryCriteria }]);
+                    }
+                    setPage(1);
+                  }}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl text-sm font-medium hover:from-indigo-700 hover:to-blue-700 transition-all shadow-md shadow-indigo-500/25"
+                >
+                  <Search className="w-4 h-4" />
+                  Sorgula
+                </button>
+                {(activeFilters.length > 0 || searchInput || statusFilter) && (
+                  <button
+                    onClick={() => {
+                      setQueryValue('');
+                      setSearchInput('');
+                      setStatusFilter('');
+                      setActiveFilters([]);
+                      setPage(1);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white border border-red-200 text-red-600 rounded-xl text-sm font-medium hover:bg-red-50 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                    Temizle
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Aktif Filtreler */}
+            {activeFilters.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+                <span className="text-xs text-slate-500 font-medium">Aktif Filtreler:</span>
+                {activeFilters.map((f, i) => (
+                  <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg text-xs font-medium">
+                    <span className="text-indigo-500">{f.label}:</span> {f.value}
+                    <button
+                      onClick={() => {
+                        setActiveFilters(prev => prev.filter((_, idx) => idx !== i));
+                        if (activeFilters.length === 1) {
+                          setSearchInput('');
+                          setStatusFilter('');
+                        }
+                        setPage(1);
+                      }}
+                      className="ml-0.5 hover:text-red-500 transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
