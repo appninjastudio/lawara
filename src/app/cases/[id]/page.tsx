@@ -23,10 +23,27 @@ import {
   XCircle,
   Loader2,
   Plus,
+  Shield,
+  Car,
+  Home,
+  Banknote,
+  Gavel,
+  Scale,
+  Download,
+  FileCode,
+  Eye,
+  ChevronDown,
+  ChevronUp,
+  Send,
+  ExternalLink,
+  Copy,
+  CheckCircle,
+  Briefcase,
 } from 'lucide-react';
 import { useState, useEffect, use } from 'react';
 import clsx from 'clsx';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface CaseDetail {
   id: number;
   caseNumber: string;
@@ -45,7 +62,7 @@ interface CaseDetail {
     city: string | null; district: string | null;
   };
   creditor: {
-    id: number; name: string; type: string;
+    id: number; name: string; type: string; taxNo?: string;
     phone: string | null; email: string | null; address: string | null;
   };
   court: { id: number; name: string; city: string; district: string };
@@ -71,6 +88,23 @@ interface CaseDetail {
     id: number; type: string; recipient: string; content: string;
     status: string; sentAt: string | null; pttBarcode: string | null;
     createdAt: string;
+  }[];
+  seizures: {
+    id: number; type: string; status: string; createdAt: string;
+    description: string; details: any;
+  }[];
+  lawsuits: {
+    id: number; type: string; status: string; courtName: string;
+    caseNumber: string; filingDate: string; nextHearingDate: string | null;
+    subject: string; description: string; plaintiff: string; defendant: string;
+    requestedPenalty: string | null; result?: string;
+    hearings: { id: number; date: string; type: string; result: string; nextDate: string | null }[];
+    documents: { id: number; name: string; date: string; type: string }[];
+  }[];
+  tebligats: {
+    id: number; type: string; status: string; recipient: string;
+    address: string; sentDate: string; deliveryDate: string | null;
+    pttBarcode: string; deliveryMethod: string | null;
   }[];
 }
 
@@ -103,10 +137,13 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const [caseData, setCaseData] = useState<CaseDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'commitments' | 'notes' | 'notifications'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'seizures' | 'lawsuits' | 'tebligat' | 'transactions' | 'commitments' | 'notes' | 'notifications' | 'uyap_xml'>('overview');
   const [newNote, setNewNote] = useState('');
   const [noteType, setNoteType] = useState('note');
   const [addingNote, setAddingNote] = useState(false);
+  const [expandedSeizure, setExpandedSeizure] = useState<number | null>(null);
+  const [expandedLawsuit, setExpandedLawsuit] = useState<number | null>(null);
+  const [xmlCopied, setXmlCopied] = useState(false);
 
   useEffect(() => {
     async function fetchCase() {
@@ -187,10 +224,14 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
 
   const tabs = [
     { key: 'overview' as const, label: 'Genel Bakış', icon: FileText },
+    { key: 'seizures' as const, label: `Hacizler (${caseData.seizures?.length || 0})`, icon: Shield },
+    { key: 'lawsuits' as const, label: `Davalar (${caseData.lawsuits?.length || 0})`, icon: Gavel },
+    { key: 'tebligat' as const, label: `Tebligat (${caseData.tebligats?.length || 0})`, icon: Send },
     { key: 'transactions' as const, label: `İşlemler (${caseData.transactions.length})`, icon: DollarSign },
     { key: 'commitments' as const, label: `Taahhütler (${caseData.commitments.length})`, icon: CreditCard },
     { key: 'notes' as const, label: `Notlar (${caseData.notes.length})`, icon: MessageSquare },
     { key: 'notifications' as const, label: `Bildirimler (${caseData.notifications.length})`, icon: Bell },
+    { key: 'uyap_xml' as const, label: 'UYAP XML', icon: FileCode },
   ];
 
   return (
@@ -510,6 +551,484 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
             )}
           </div>
         )}
+
+        {/* ═══════════════ HACİZLER TAB ═══════════════ */}
+        {activeTab === 'seizures' && (
+          <div className="space-y-4">
+            {/* Haciz Özet Kartları */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              {[
+                { type: 'bank', label: 'Banka', icon: Banknote, color: 'bg-blue-100 text-blue-700' },
+                { type: 'vehicle', label: 'Araç', icon: Car, color: 'bg-cyan-100 text-cyan-700' },
+                { type: 'property', label: 'Taşınmaz', icon: Home, color: 'bg-emerald-100 text-emerald-700' },
+                { type: 'salary', label: 'Maaş', icon: Briefcase, color: 'bg-purple-100 text-purple-700' },
+                { type: 'receivable', label: 'Alacak', icon: DollarSign, color: 'bg-amber-100 text-amber-700' },
+              ].map(st => {
+                const count = caseData.seizures?.filter(s => s.type === st.type).length || 0;
+                return (
+                  <div key={st.type} className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-center">
+                    <div className={clsx('inline-flex p-2 rounded-lg mb-2', st.color)}><st.icon className="w-5 h-5" /></div>
+                    <p className="text-2xl font-bold text-slate-900">{count}</p>
+                    <p className="text-xs text-slate-500">{st.label} Haczi</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {(!caseData.seizures || caseData.seizures.length === 0) ? (
+              <div className="bg-white rounded-xl border border-slate-100 py-12 text-center text-slate-400 shadow-sm">
+                <Shield className="w-10 h-10 mx-auto mb-2" />
+                <p>Henüz haciz kaydı yok</p>
+              </div>
+            ) : caseData.seizures.map(seizure => {
+              const isExpanded = expandedSeizure === seizure.id;
+              const typeConfig: Record<string, { label: string; icon: typeof Shield; color: string }> = {
+                bank: { label: 'Banka Haczi', icon: Banknote, color: 'bg-blue-100 text-blue-700' },
+                vehicle: { label: 'Araç Haczi', icon: Car, color: 'bg-cyan-100 text-cyan-700' },
+                property: { label: 'Taşınmaz Haczi', icon: Home, color: 'bg-emerald-100 text-emerald-700' },
+                salary: { label: 'Maaş Haczi', icon: Briefcase, color: 'bg-purple-100 text-purple-700' },
+                receivable: { label: 'Alacak Haczi', icon: DollarSign, color: 'bg-amber-100 text-amber-700' },
+              };
+              const tc = typeConfig[seizure.type] || { label: seizure.type, icon: Shield, color: 'bg-slate-100 text-slate-700' };
+              const SeizureIcon = tc.icon;
+              const statusColor = seizure.status === 'active' ? 'bg-emerald-100 text-emerald-700' : seizure.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700';
+
+              return (
+                <div key={seizure.id} className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+                  <button
+                    onClick={() => setExpandedSeizure(isExpanded ? null : seizure.id)}
+                    className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={clsx('p-2.5 rounded-xl', tc.color)}><SeizureIcon className="w-5 h-5" /></div>
+                      <div>
+                        <h4 className="font-semibold text-slate-900">{seizure.description}</h4>
+                        <p className="text-sm text-slate-500 mt-0.5">{formatDate(seizure.createdAt)}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={clsx('px-3 py-1 rounded-full text-xs font-medium', statusColor)}>
+                        {seizure.status === 'active' ? 'Aktif' : seizure.status === 'pending' ? 'Beklemede' : seizure.status}
+                      </span>
+                      {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+                    </div>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="border-t border-slate-100 p-5 bg-slate-50/50">
+                      {seizure.type === 'bank' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Banka</span><span className="text-sm font-medium">{seizure.details.bankName}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Hesap Türü</span><span className="text-sm font-medium">{seizure.details.accountType}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">IBAN</span><span className="text-sm font-medium font-mono text-xs">{seizure.details.iban}</span></div>
+                          </div>
+                          <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Bloke Tutar</span><span className={clsx('text-sm font-bold', seizure.details.blockedAmount > 0 ? 'text-emerald-600' : 'text-red-500')}>{formatCurrency(seizure.details.blockedAmount)}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Yanıt Tarihi</span><span className="text-sm font-medium">{seizure.details.responseDate ? formatDate(seizure.details.responseDate) : '-'}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Sonuç</span><span className={clsx('px-2 py-0.5 rounded text-xs font-medium', seizure.details.responseStatus === 'positive' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700')}>{seizure.details.responseStatus === 'positive' ? 'Olumlu' : 'Olumsuz'}</span></div>
+                          </div>
+                          {seizure.details.responseNote && <div className="col-span-full p-3 bg-blue-50 rounded-lg text-sm text-blue-800"><strong>Not:</strong> {seizure.details.responseNote}</div>}
+                        </div>
+                      )}
+                      {seizure.type === 'vehicle' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Plaka</span><span className="text-sm font-bold">{seizure.details.plate}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Marka/Model</span><span className="text-sm font-medium">{seizure.details.brand} {seizure.details.model} ({seizure.details.year})</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Şasi No</span><span className="text-sm font-medium font-mono text-xs">{seizure.details.chassisNo}</span></div>
+                          </div>
+                          <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Motor No</span><span className="text-sm font-medium font-mono text-xs">{seizure.details.engineNo}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Tahmini Değer</span><span className="text-sm font-bold text-blue-600">{formatCurrency(seizure.details.estimatedValue)}</span></div>
+                          </div>
+                          {seizure.details.seizureNote && <div className="col-span-full p-3 bg-cyan-50 rounded-lg text-sm text-cyan-800"><strong>Not:</strong> {seizure.details.seizureNote}</div>}
+                        </div>
+                      )}
+                      {seizure.type === 'property' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Adres</span><span className="text-sm font-medium text-right max-w-[65%]">{seizure.details.address}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Ada/Parsel</span><span className="text-sm font-medium">{seizure.details.parcel}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Alan</span><span className="text-sm font-medium">{seizure.details.area}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Tür</span><span className="text-sm font-medium">{seizure.details.propertyType}</span></div>
+                          </div>
+                          <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Tapu No</span><span className="text-sm font-medium font-mono">{seizure.details.tapuNo}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Tahmini Değer</span><span className="text-sm font-bold text-emerald-600">{formatCurrency(seizure.details.estimatedValue)}</span></div>
+                            {seizure.details.mortgageInfo && <div className="flex justify-between"><span className="text-sm text-slate-500">İpotek</span><span className="text-sm font-medium text-amber-600 text-right max-w-[65%]">{seizure.details.mortgageInfo}</span></div>}
+                          </div>
+                          {seizure.details.seizureNote && <div className="col-span-full p-3 bg-emerald-50 rounded-lg text-sm text-emerald-800"><strong>Not:</strong> {seizure.details.seizureNote}</div>}
+                        </div>
+                      )}
+                      {seizure.type === 'salary' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">İşveren</span><span className="text-sm font-medium">{seizure.details.employer}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">SGK No</span><span className="text-sm font-medium font-mono">{seizure.details.sgkNo}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Aylık Maaş</span><span className="text-sm font-medium">{formatCurrency(seizure.details.monthlySalary)}</span></div>
+                          </div>
+                          <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Kesinti Oranı</span><span className="text-sm font-bold">%{seizure.details.deductionRate}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Aylık Kesinti</span><span className="text-sm font-bold text-purple-600">{formatCurrency(seizure.details.deductionAmount)}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Başlangıç</span><span className="text-sm font-medium">{formatDate(seizure.details.startDate)}</span></div>
+                          </div>
+                          {seizure.details.responseNote && <div className="col-span-full p-3 bg-purple-50 rounded-lg text-sm text-purple-800"><strong>Not:</strong> {seizure.details.responseNote}</div>}
+                        </div>
+                      )}
+                      {seizure.type === 'receivable' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">İcra Dairesi</span><span className="text-sm font-medium">{seizure.details.thirdPartyCourt}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Dosya No</span><span className="text-sm font-medium">{seizure.details.thirdPartyCaseNo}</span></div>
+                          </div>
+                          <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Borçlu</span><span className="text-sm font-medium">{seizure.details.thirdPartyDebtor}</span></div>
+                            <div className="flex justify-between"><span className="text-sm text-slate-500">Beklenen Tutar</span><span className="text-sm font-bold text-amber-600">{formatCurrency(seizure.details.expectedAmount)}</span></div>
+                          </div>
+                          {seizure.details.seizureNote && <div className="col-span-full p-3 bg-amber-50 rounded-lg text-sm text-amber-800"><strong>Not:</strong> {seizure.details.seizureNote}</div>}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ═══════════════ DAVALAR TAB ═══════════════ */}
+        {activeTab === 'lawsuits' && (
+          <div className="space-y-4">
+            {(!caseData.lawsuits || caseData.lawsuits.length === 0) ? (
+              <div className="bg-white rounded-xl border border-slate-100 py-12 text-center text-slate-400 shadow-sm">
+                <Gavel className="w-10 h-10 mx-auto mb-2" />
+                <p>Henüz dava kaydı yok</p>
+              </div>
+            ) : caseData.lawsuits.map(lawsuit => {
+              const isExpanded = expandedLawsuit === lawsuit.id;
+              const lawStatusColor = lawsuit.status === 'active' ? 'bg-blue-100 text-blue-700' : lawsuit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700';
+              const lawStatusLabel = lawsuit.status === 'active' ? 'Devam Ediyor' : lawsuit.status === 'completed' ? 'Sonuçlandı' : lawsuit.status;
+
+              return (
+                <div key={lawsuit.id} className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+                  <button
+                    onClick={() => setExpandedLawsuit(isExpanded ? null : lawsuit.id)}
+                    className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="p-2.5 bg-indigo-100 rounded-xl"><Gavel className="w-5 h-5 text-indigo-700" /></div>
+                      <div>
+                        <h4 className="font-semibold text-slate-900">{lawsuit.subject}</h4>
+                        <p className="text-sm text-slate-500 mt-0.5">{lawsuit.courtName} — {lawsuit.caseNumber}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {lawsuit.nextHearingDate && (
+                        <span className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                          <Calendar className="w-3.5 h-3.5" />
+                          Sonraki: {formatDate(lawsuit.nextHearingDate)}
+                        </span>
+                      )}
+                      <span className={clsx('px-3 py-1 rounded-full text-xs font-medium', lawStatusColor)}>{lawStatusLabel}</span>
+                      {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+                    </div>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="border-t border-slate-100">
+                      {/* Dava Bilgileri */}
+                      <div className="p-5 bg-slate-50/50 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <div className="flex justify-between"><span className="text-sm text-slate-500">Mahkeme</span><span className="text-sm font-medium">{lawsuit.courtName}</span></div>
+                          <div className="flex justify-between"><span className="text-sm text-slate-500">Esas No</span><span className="text-sm font-medium">{lawsuit.caseNumber}</span></div>
+                          <div className="flex justify-between"><span className="text-sm text-slate-500">Açılış Tarihi</span><span className="text-sm font-medium">{formatDate(lawsuit.filingDate)}</span></div>
+                          <div className="flex justify-between"><span className="text-sm text-slate-500">Davacı</span><span className="text-sm font-medium text-right max-w-[65%]">{lawsuit.plaintiff}</span></div>
+                        </div>
+                        <div className="space-y-3">
+                          <div className="flex justify-between"><span className="text-sm text-slate-500">Davalı</span><span className="text-sm font-medium">{lawsuit.defendant}</span></div>
+                          {lawsuit.requestedPenalty && <div className="flex justify-between"><span className="text-sm text-slate-500">Talep</span><span className="text-sm font-medium text-red-600">{lawsuit.requestedPenalty}</span></div>}
+                          {lawsuit.result && <div className="flex justify-between"><span className="text-sm text-slate-500">Sonuç</span><span className="text-sm font-bold text-emerald-600 text-right max-w-[65%]">{lawsuit.result}</span></div>}
+                        </div>
+                        <div className="col-span-full p-3 bg-indigo-50 rounded-lg text-sm text-indigo-800">{lawsuit.description}</div>
+                      </div>
+
+                      {/* Duruşmalar */}
+                      {lawsuit.hearings.length > 0 && (
+                        <div className="p-5 border-t border-slate-100">
+                          <h5 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2"><Calendar className="w-4 h-4" /> Duruşmalar</h5>
+                          <div className="space-y-3">
+                            {lawsuit.hearings.map(h => (
+                              <div key={h.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                                <div className="w-2 h-2 mt-2 rounded-full bg-indigo-500 shrink-0" />
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-slate-900">{h.type}</span>
+                                    <span className="text-xs text-slate-500">{formatDate(h.date)}</span>
+                                  </div>
+                                  <p className="text-sm text-slate-600 mt-1">{h.result}</p>
+                                  {h.nextDate && <p className="text-xs text-orange-600 mt-1">Sonraki duruşma: {formatDate(h.nextDate)}</p>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Belgeler */}
+                      {lawsuit.documents.length > 0 && (
+                        <div className="p-5 border-t border-slate-100">
+                          <h5 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2"><FileText className="w-4 h-4" /> Belgeler</h5>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                            {lawsuit.documents.map(doc => (
+                              <div key={doc.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
+                                <FileText className="w-4 h-4 text-indigo-500 shrink-0" />
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-medium text-slate-900 truncate">{doc.name}</p>
+                                  <p className="text-xs text-slate-500">{formatDate(doc.date)}</p>
+                                </div>
+                                <Eye className="w-4 h-4 text-slate-400" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ═══════════════ TEBLİGAT TAB ═══════════════ */}
+        {activeTab === 'tebligat' && (
+          <div className="space-y-4">
+            {(!caseData.tebligats || caseData.tebligats.length === 0) ? (
+              <div className="bg-white rounded-xl border border-slate-100 py-12 text-center text-slate-400 shadow-sm">
+                <Send className="w-10 h-10 mx-auto mb-2" />
+                <p>Henüz tebligat kaydı yok</p>
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-100">
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Tür</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Muhatap</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Adres</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Gönderim</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Teslim</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Barkod</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Durum</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {caseData.tebligats.map(t => {
+                      const tebTypeLabels: Record<string, string> = {
+                        odeme_emri: 'Ödeme Emri',
+                        '103_davetiye': '103 Davetiye',
+                        haciz_ihbarnamesi: 'Haciz İhbarnamesi',
+                        maas_haczi_muze: 'Maaş Haczi Müz.',
+                      };
+                      const tebStatusConfig: Record<string, { label: string; color: string }> = {
+                        delivered: { label: 'Teslim Edildi', color: 'bg-emerald-100 text-emerald-700' },
+                        sent: { label: 'Gönderildi', color: 'bg-blue-100 text-blue-700' },
+                        pending: { label: 'Bekliyor', color: 'bg-amber-100 text-amber-700' },
+                        failed: { label: 'Başarısız', color: 'bg-red-100 text-red-700' },
+                      };
+                      const ts = tebStatusConfig[t.status] || { label: t.status, color: 'bg-slate-100 text-slate-700' };
+                      return (
+                        <tr key={t.id} className="hover:bg-slate-50">
+                          <td className="px-5 py-3"><span className="px-2 py-1 bg-indigo-50 text-indigo-700 rounded text-xs font-medium">{tebTypeLabels[t.type] || t.type}</span></td>
+                          <td className="px-5 py-3 text-sm font-medium text-slate-900">{t.recipient}</td>
+                          <td className="px-5 py-3 text-sm text-slate-600 max-w-[200px] truncate" title={t.address}>{t.address}</td>
+                          <td className="px-5 py-3 text-sm text-slate-600">{formatDate(t.sentDate)}</td>
+                          <td className="px-5 py-3 text-sm text-slate-600">{t.deliveryDate ? formatDate(t.deliveryDate) : '-'}</td>
+                          <td className="px-5 py-3"><span className="text-xs font-mono text-slate-500">{t.pttBarcode}</span></td>
+                          <td className="px-5 py-3"><span className={clsx('px-2 py-0.5 rounded text-xs font-medium', ts.color)}>{ts.label}</span></td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ═══════════════ UYAP XML EXPORT TAB ═══════════════ */}
+        {activeTab === 'uyap_xml' && (() => {
+          const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<UyapTakipAcma xmlns="http://uyap.gov.tr/icra/takip" versiyon="2.0">
+  <TakipBilgileri>
+    <DosyaNo>${caseData.caseNumber}</DosyaNo>
+    <FoyNo>${caseData.foyNumber || ''}</FoyNo>
+    <TakipTuru>${caseData.caseType === 'ilamsiz' ? 'İlamsız İcra' : caseData.caseType === 'ilamli' ? 'İlamlı İcra' : 'Kambiyo'}</TakipTuru>
+    <IcraDairesi>${caseData.court.name}</IcraDairesi>
+    <Sehir>${caseData.court.city}</Sehir>
+    <AcilisTarihi>${new Date(caseData.createdAt).toISOString().split('T')[0]}</AcilisTarihi>
+  </TakipBilgileri>
+
+  <AlacakliBilgileri>
+    <Ad>${caseData.creditor.name}</Ad>
+    <Tur>${caseData.creditor.type}</Tur>
+    <VergiNo>${caseData.creditor.taxNo || ''}</VergiNo>
+    <Adres>${caseData.creditor.address || ''}</Adres>
+    <Telefon>${caseData.creditor.phone || ''}</Telefon>
+    <Eposta>${caseData.creditor.email || ''}</Eposta>
+  </AlacakliBilgileri>
+
+  <BorcluBilgileri>
+    <Ad>${caseData.debtor.firstName}</Ad>
+    <Soyad>${caseData.debtor.lastName}</Soyad>
+    <TCKimlikNo>${caseData.debtor.tcNo}</TCKimlikNo>
+    <Telefon>${caseData.debtor.phone || ''}</Telefon>
+    <Eposta>${caseData.debtor.email || ''}</Eposta>
+    <Adres>${caseData.debtor.address || ''}</Adres>
+    <Il>${caseData.debtor.city || ''}</Il>
+    <Ilce>${caseData.debtor.district || ''}</Ilce>
+  </BorcluBilgileri>
+
+  <AlacakBilgileri>
+    <AnaPara>${caseData.principalAmount.toFixed(2)}</AnaPara>
+    <Faiz>${caseData.interestAmount.toFixed(2)}</Faiz>
+    <ToplamTutar>${caseData.totalAmount.toFixed(2)}</ToplamTutar>
+    <ParaBirimi>TRY</ParaBirimi>
+  </AlacakBilgileri>
+
+  <HacizBilgileri>${(caseData.seizures || []).map(s => {
+    if (s.type === 'bank') return `
+    <BankaHaczi>
+      <BankaAdi>${s.details.bankName}</BankaAdi>
+      <IBAN>${s.details.iban}</IBAN>
+      <BlokeTutar>${s.details.blockedAmount?.toFixed(2) || '0.00'}</BlokeTutar>
+      <Durum>${s.status}</Durum>
+    </BankaHaczi>`;
+    if (s.type === 'vehicle') return `
+    <AracHaczi>
+      <Plaka>${s.details.plate}</Plaka>
+      <Marka>${s.details.brand} ${s.details.model}</Marka>
+      <Yil>${s.details.year}</Yil>
+      <SasiNo>${s.details.chassisNo}</SasiNo>
+      <MotorNo>${s.details.engineNo}</MotorNo>
+      <TahminiDeger>${s.details.estimatedValue?.toFixed(2) || '0.00'}</TahminiDeger>
+    </AracHaczi>`;
+    if (s.type === 'property') return `
+    <TasinmazHaczi>
+      <Adres>${s.details.address}</Adres>
+      <AdaParsel>${s.details.parcel}</AdaParsel>
+      <Alan>${s.details.area}</Alan>
+      <TapuNo>${s.details.tapuNo}</TapuNo>
+      <TahminiDeger>${s.details.estimatedValue?.toFixed(2) || '0.00'}</TahminiDeger>
+    </TasinmazHaczi>`;
+    if (s.type === 'salary') return `
+    <MaasHaczi>
+      <Isveren>${s.details.employer}</Isveren>
+      <SGKNo>${s.details.sgkNo}</SGKNo>
+      <AylikMaas>${s.details.monthlySalary?.toFixed(2) || '0.00'}</AylikMaas>
+      <KesintiOrani>${s.details.deductionRate}</KesintiOrani>
+    </MaasHaczi>`;
+    return '';
+  }).join('')}
+  </HacizBilgileri>
+
+  <DavaBilgileri>${(caseData.lawsuits || []).map(l => `
+    <Dava>
+      <Mahkeme>${l.courtName}</Mahkeme>
+      <EsasNo>${l.caseNumber}</EsasNo>
+      <Konu>${l.subject}</Konu>
+      <AcilisTarihi>${new Date(l.filingDate).toISOString().split('T')[0]}</AcilisTarihi>
+      <Durum>${l.status}</Durum>${l.result ? `
+      <Sonuc>${l.result}</Sonuc>` : ''}
+    </Dava>`).join('')}
+  </DavaBilgileri>
+
+  <VekilBilgileri>
+    <Ad>${caseData.createdBy.name}</Ad>
+    <Eposta>${caseData.createdBy.email}</Eposta>
+    <BaroSicilNo>12345</BaroSicilNo>
+  </VekilBilgileri>
+</UyapTakipAcma>`;
+
+          const handleDownloadXml = () => {
+            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `uyap-takip-${caseData.caseNumber.replace('/', '-')}.xml`;
+            a.click();
+            URL.revokeObjectURL(url);
+          };
+
+          const handleCopyXml = () => {
+            navigator.clipboard.writeText(xmlContent);
+            setXmlCopied(true);
+            setTimeout(() => setXmlCopied(false), 2000);
+          };
+
+          return (
+            <div className="space-y-4">
+              {/* Bilgi Kartı */}
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 p-5">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-indigo-100 rounded-xl"><FileCode className="w-6 h-6 text-indigo-600" /></div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-slate-900">UYAP Takip Açma XML</h3>
+                    <p className="text-sm text-slate-600 mt-1">Bu dosyayı indirip UYAP portalına yükleyerek doğrudan icra takibi açabilirsiniz. XML dosyası tüm borçlu, alacaklı, haciz ve dava bilgilerini içerir.</p>
+                    <div className="flex items-center gap-3 mt-4">
+                      <button onClick={handleDownloadXml} className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                        <Download className="w-4 h-4" />
+                        XML İndir
+                      </button>
+                      <button onClick={handleCopyXml} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 transition-colors">
+                        {xmlCopied ? <><CheckCircle className="w-4 h-4 text-emerald-500" /> Kopyalandı!</> : <><Copy className="w-4 h-4" /> Kopyala</>}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* XML Özet */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-center">
+                  <Scale className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
+                  <p className="text-lg font-bold text-slate-900">{caseData.caseType === 'ilamsiz' ? 'İlamsız' : caseData.caseType === 'ilamli' ? 'İlamlı' : 'Kambiyo'}</p>
+                  <p className="text-xs text-slate-500">Takip Türü</p>
+                </div>
+                <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-center">
+                  <Shield className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                  <p className="text-lg font-bold text-slate-900">{caseData.seizures?.length || 0}</p>
+                  <p className="text-xs text-slate-500">Haciz Kaydı</p>
+                </div>
+                <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-center">
+                  <Gavel className="w-5 h-5 text-purple-500 mx-auto mb-1" />
+                  <p className="text-lg font-bold text-slate-900">{caseData.lawsuits?.length || 0}</p>
+                  <p className="text-xs text-slate-500">Dava</p>
+                </div>
+                <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-center">
+                  <DollarSign className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
+                  <p className="text-lg font-bold text-slate-900">{formatCurrency(caseData.totalAmount)}</p>
+                  <p className="text-xs text-slate-500">Toplam Alacak</p>
+                </div>
+              </div>
+
+              {/* XML Önizleme */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
+                  <div className="flex items-center gap-2">
+                    <FileCode className="w-4 h-4 text-slate-500" />
+                    <span className="text-sm font-medium text-slate-700">uyap-takip-{caseData.caseNumber.replace('/', '-')}.xml</span>
+                  </div>
+                  <span className="text-xs text-slate-400">{(new TextEncoder().encode(xmlContent).length / 1024).toFixed(1)} KB</span>
+                </div>
+                <pre className="p-4 text-xs font-mono text-slate-700 overflow-auto max-h-96 bg-slate-900 text-slate-300 leading-relaxed">
+                  {xmlContent}
+                </pre>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
