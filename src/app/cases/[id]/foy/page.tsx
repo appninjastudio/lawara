@@ -8,13 +8,14 @@ import {
   Home as HomeIcon, Banknote, Info, X, MessageSquare, Navigation,
   ArrowUpDown, TrendingUp, Shield, BarChart3, Receipt, Mail,
   Car, Package, CircleDollarSign, Activity, ChevronDown,
+  Star, Upload, Download, FolderOpen, Filter, Paperclip, ExternalLink,
 } from 'lucide-react';
 import { useState, useEffect, use } from 'react';
 import clsx from 'clsx';
-import type { IcraFoyu, HesaplananDegerler, Tahsilat, IslemKaydi, BorcluGorusmesi, YerindeZiyaret } from '@/types/icra-foyu';
-import { TAKIP_TURU_OPTIONS, DOSYA_STATUSU_OPTIONS, FAIZ_TURU_OPTIONS, ODEME_YONTEMI_OPTIONS, TAHSIL_OLASILIGI_OPTIONS, HACIZ_TURU_OPTIONS, TEBLIGAT_TURU_OPTIONS } from '@/types/icra-foyu';
+import type { IcraFoyu, HesaplananDegerler, Tahsilat, IslemKaydi, BorcluGorusmesi, YerindeZiyaret, Belge, BelgeKategorisi, BelgeKaynagi } from '@/types/icra-foyu';
+import { TAKIP_TURU_OPTIONS, DOSYA_STATUSU_OPTIONS, FAIZ_TURU_OPTIONS, ODEME_YONTEMI_OPTIONS, TAHSIL_OLASILIGI_OPTIONS, HACIZ_TURU_OPTIONS, TEBLIGAT_TURU_OPTIONS, BELGE_KATEGORISI_OPTIONS, BELGE_KAYNAGI_OPTIONS } from '@/types/icra-foyu';
 
-type TabKey = 'dosya' | 'taraflar' | 'alacak' | 'tahsilat' | 'islemler' | 'hacizler' | 'malvarligi' | 'operasyonel';
+type TabKey = 'dosya' | 'taraflar' | 'alacak' | 'tahsilat' | 'islemler' | 'hacizler' | 'malvarligi' | 'belgeler' | 'operasyonel';
 const TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
   { key: 'dosya', label: 'Dosya Bilgileri', icon: <FileText className="w-4 h-4" /> },
   { key: 'taraflar', label: 'Taraflar', icon: <User className="w-4 h-4" /> },
@@ -23,11 +24,20 @@ const TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
   { key: 'islemler', label: 'İşlem Geçmişi', icon: <Activity className="w-4 h-4" /> },
   { key: 'hacizler', label: 'Haciz & Tebligat', icon: <Shield className="w-4 h-4" /> },
   { key: 'malvarligi', label: 'Malvarlığı', icon: <Search className="w-4 h-4" /> },
+  { key: 'belgeler', label: 'Belgeler', icon: <FolderOpen className="w-4 h-4" /> },
   { key: 'operasyonel', label: 'Operasyonel', icon: <BarChart3 className="w-4 h-4" /> },
 ];
 
 function fc(n: number) { return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 2 }).format(n); }
 function fd(d: string | null) { if (!d) return '-'; return new Date(d).toLocaleDateString('tr-TR'); }
+function fsize(bytes: number) { if (bytes < 1024) return `${bytes} B`; if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`; return `${(bytes / 1048576).toFixed(1)} MB`; }
+function getFileIcon(ext: string) {
+  if (['.pdf'].includes(ext)) return 'text-red-600 bg-red-50';
+  if (['.doc', '.docx'].includes(ext)) return 'text-blue-600 bg-blue-50';
+  if (['.xls', '.xlsx'].includes(ext)) return 'text-emerald-600 bg-emerald-50';
+  if (['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext)) return 'text-purple-600 bg-purple-50';
+  return 'text-slate-600 bg-slate-50';
+}
 
 export default function FoyUpdatePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -48,6 +58,11 @@ export default function FoyUpdatePage({ params }: { params: Promise<{ id: string
   const [localZiyaretler, setLocalZiyaretler] = useState<YerindeZiyaret[]>([]);
   const [localTahsilatlar, setLocalTahsilatlar] = useState<Tahsilat[]>([]);
   const [localIslemler, setLocalIslemler] = useState<IslemKaydi[]>([]);
+  const [localBelgeler, setLocalBelgeler] = useState<Belge[]>([]);
+  const [belgeArama, setBelgeArama] = useState('');
+  const [belgeKategoriFiltre, setBelgeKategoriFiltre] = useState<string>('all');
+  const [belgeKaynakFiltre, setBelgeKaynakFiltre] = useState<string>('all');
+  const [belgeSadecaOnemli, setBelgeSadecaOnemli] = useState(false);
   const [mForm, setMForm] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -61,6 +76,7 @@ export default function FoyUpdatePage({ params }: { params: Promise<{ id: string
           setLocalZiyaretler(json.data.ziyaretler || []);
           setLocalTahsilatlar(json.data.tahsilatlar || []);
           setLocalIslemler(json.data.islemGecmisi || []);
+          setLocalBelgeler(json.data.belgeler || []);
           const d = json.data.dosya;
           setDosyaForm({ icraDairesi: d.icraDairesi || '', dosyaNo: d.dosyaNo || '', takipTuru: d.takipTuru || 'ilamsiz', dosyaStatusu: d.dosyaStatusu || 'acik', dosyaAcilisTarihi: d.dosyaAcilisTarihi || '', infazTarihi: d.infazTarihi || '', faizTuru: d.faizTuru || 'yasal', faizOrani: d.faizOrani?.toString() || '', icraBankaAdi: d.icraBankaAdi || '', icraBankaIban: d.icraBankaIban || '', mtsTakibi: d.mtsTakibi || false, aboneNo: d.aboneNo || '', musteriKodu: d.musteriKodu || '', klasorNo: d.klasorNo || '', foyNo: d.foyNo || '', dosyaSorumlusu: d.dosyaSorumlusu || '' });
         }
@@ -81,7 +97,7 @@ export default function FoyUpdatePage({ params }: { params: Promise<{ id: string
   const handleDelete = async () => { setDeleting(true); await new Promise(r => setTimeout(r, 1000)); showToastMsg('Takip silindi'); setShowDeleteModal(false); setTimeout(() => { window.location.href = '/cases'; }, 1500); setDeleting(false); };
 
   const handleModalSubmit = async () => {
-    if (!mForm.aciklama?.trim() && showModal !== 'tahsilat') { showToastMsg('Açıklama giriniz', 'error'); return; }
+    if (!mForm.aciklama?.trim() && showModal !== 'tahsilat' && showModal !== 'belge') { showToastMsg('Açıklama giriniz', 'error'); return; }
     if (showModal === 'tahsilat' && !mForm.tutar) { showToastMsg('Tutar giriniz', 'error'); return; }
     setModalSaving(true);
     await new Promise(r => setTimeout(r, 500));
@@ -101,6 +117,27 @@ export default function FoyUpdatePage({ params }: { params: Promise<{ id: string
     } else if (showModal === 'islem') {
       setLocalIslemler(prev => [{ id: Date.now(), dosyaId: parseInt(id), islemTipi: (mForm.tip || 'not_eklendi') as IslemKaydi['islemTipi'], islemTarihi: tarih, aciklama: mForm.aciklama || '', iliskiliTebligatId: null, iliskiliHacizId: null, iliskiliTahsilatId: null, sonuc: null, belgeNo: null, yapanKisi: foyu?.dosya.dosyaSorumlusu || '', yapanKisiId: 1, hatirlatmaTarihi: null, hatirlatmaAciklamasi: null, createdAt: now }, ...prev]);
       showToastMsg('İşlem eklendi');
+    } else if (showModal === 'belge') {
+      if (!mForm.belgeAdi?.trim()) { setModalSaving(false); showToastMsg('Belge adı giriniz', 'error'); return; }
+      const yeniBelge: Belge = {
+        id: Date.now(), dosyaId: parseInt(id),
+        belgeAdi: mForm.belgeAdi || '', dosyaAdi: mForm.dosyaAdi || `belge_${Date.now()}.pdf`,
+        belgeKategorisi: (mForm.kategori || 'diger') as BelgeKategorisi,
+        belgeKaynagi: (mForm.kaynak || 'manuel') as BelgeKaynagi,
+        dosyaBoyutu: Math.floor(Math.random() * 3000000) + 50000,
+        dosyaTipi: 'application/pdf', dosyaUzantisi: '.pdf',
+        uyapEvrakId: mForm.kaynak === 'uyap' ? `UYAP-EVR-${Date.now()}` : null,
+        uyapEvrakTuru: mForm.kaynak === 'uyap' ? mForm.belgeAdi : null,
+        uyapIndirmeTarihi: mForm.kaynak === 'uyap' ? tarih : null,
+        aciklama: mForm.aciklama || null, onemliMi: mForm.onemli === 'true',
+        etiketler: (mForm.etiketler || '').split(',').map(e => e.trim()).filter(Boolean),
+        depolamaYolu: `/belgeler/${dosyaForm.dosyaNo?.replace('/', '_')}/${mForm.dosyaAdi || 'belge.pdf'}`,
+        onizlemeUrl: null,
+        yukleyenKisi: foyu?.dosya.dosyaSorumlusu || '', yukleyenKisiId: 1,
+        createdAt: now, updatedAt: now,
+      };
+      setLocalBelgeler(prev => [yeniBelge, ...prev]);
+      showToastMsg('Belge eklendi');
     }
     setModalSaving(false); setShowModal(null); setMForm({});
   };
@@ -353,6 +390,82 @@ export default function FoyUpdatePage({ params }: { params: Promise<{ id: string
             </div>
           )}
 
+          {/* BELGELER */}
+          {activeTab === 'belgeler' && (() => {
+            const filtered = localBelgeler.filter(b => {
+              if (belgeSadecaOnemli && !b.onemliMi) return false;
+              if (belgeKategoriFiltre !== 'all' && b.belgeKategorisi !== belgeKategoriFiltre) return false;
+              if (belgeKaynakFiltre !== 'all' && b.belgeKaynagi !== belgeKaynakFiltre) return false;
+              if (belgeArama) { const q = belgeArama.toLowerCase(); return b.belgeAdi.toLowerCase().includes(q) || b.dosyaAdi.toLowerCase().includes(q) || (b.aciklama || '').toLowerCase().includes(q) || b.etiketler.some(e => e.toLowerCase().includes(q)); }
+              return true;
+            }).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+            const uyapCount = localBelgeler.filter(b => b.belgeKaynagi === 'uyap').length;
+            const onemliCount = localBelgeler.filter(b => b.onemliMi).length;
+            const toplamBoyut = localBelgeler.reduce((s, b) => s + b.dosyaBoyutu, 0);
+            return (
+            <div className="space-y-4">
+              {/* Summary Bar */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-3 flex items-center gap-3"><div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center"><FolderOpen className="w-4 h-4 text-blue-600" /></div><div><p className="text-[10px] text-slate-500 uppercase">Toplam Belge</p><p className="text-lg font-bold text-slate-900">{localBelgeler.length}</p></div></div>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-3 flex items-center gap-3"><div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center"><ExternalLink className="w-4 h-4 text-indigo-600" /></div><div><p className="text-[10px] text-slate-500 uppercase">UYAP Belge</p><p className="text-lg font-bold text-indigo-700">{uyapCount}</p></div></div>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-3 flex items-center gap-3"><div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center"><Star className="w-4 h-4 text-amber-600" /></div><div><p className="text-[10px] text-slate-500 uppercase">Önemli</p><p className="text-lg font-bold text-amber-700">{onemliCount}</p></div></div>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-3 flex items-center gap-3"><div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center"><Paperclip className="w-4 h-4 text-slate-600" /></div><div><p className="text-[10px] text-slate-500 uppercase">Toplam Boyut</p><p className="text-lg font-bold text-slate-700">{fsize(toplamBoyut)}</p></div></div>
+              </div>
+              {/* Toolbar */}
+              <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex-1 min-w-[200px] relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" value={belgeArama} onChange={e => setBelgeArama(e.target.value)} placeholder="Belge ara (ad, açıklama, etiket)..." className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+                  <select value={belgeKategoriFiltre} onChange={e => setBelgeKategoriFiltre(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="all">Tüm Kategoriler</option>{BELGE_KATEGORISI_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
+                  <select value={belgeKaynakFiltre} onChange={e => setBelgeKaynakFiltre(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="all">Tüm Kaynaklar</option>{BELGE_KAYNAGI_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
+                  <button onClick={() => setBelgeSadecaOnemli(!belgeSadecaOnemli)} className={clsx('px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1.5 border cursor-pointer', belgeSadecaOnemli ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50')}><Star className={clsx('w-3.5 h-3.5', belgeSadecaOnemli && 'fill-amber-400')} /> Önemli</button>
+                  <button onClick={() => { setMForm({ belgeAdi: '', dosyaAdi: '', kategori: 'diger', kaynak: 'manuel', aciklama: '', onemli: 'false', etiketler: '' }); setShowModal('belge'); }} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 flex items-center gap-1.5 cursor-pointer"><Upload className="w-3.5 h-3.5" /> Belge Ekle</button>
+                </div>
+              </div>
+              {/* Belge Listesi */}
+              {filtered.length === 0 ? (
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-12 text-center"><FolderOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" /><p className="text-sm text-slate-500">Eşleşen belge bulunamadı</p></div>
+              ) : (
+                <div className="space-y-2">
+                  {filtered.map(b => {
+                    const katOpt = BELGE_KATEGORISI_OPTIONS.find(o => o.value === b.belgeKategorisi);
+                    const kaynakOpt = BELGE_KAYNAGI_OPTIONS.find(o => o.value === b.belgeKaynagi);
+                    return (
+                    <div key={b.id} className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 hover:shadow-md transition-shadow">
+                      <div className="flex items-start gap-3">
+                        <div className={clsx('w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0', getFileIcon(b.dosyaUzantisi))}><FileText className="w-5 h-5" /></div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2"><h4 className="text-sm font-semibold text-slate-900 truncate">{b.belgeAdi}</h4>{b.onemliMi && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400 flex-shrink-0" />}</div>
+                              <p className="text-xs text-slate-500 mt-0.5 truncate">{b.dosyaAdi}</p>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
+                              <button onClick={() => setLocalBelgeler(prev => prev.map(x => x.id === b.id ? { ...x, onemliMi: !x.onemliMi } : x))} className={clsx('p-1.5 rounded-lg cursor-pointer', b.onemliMi ? 'text-amber-500 hover:bg-amber-50' : 'text-slate-400 hover:bg-slate-100')} title={b.onemliMi ? 'Önemli kaldır' : 'Önemli işaretle'}><Star className={clsx('w-4 h-4', b.onemliMi && 'fill-amber-400')} /></button>
+                              <button className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 cursor-pointer" title="İndir"><Download className="w-4 h-4" /></button>
+                              <button onClick={() => setLocalBelgeler(prev => prev.filter(x => x.id !== b.id))} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 cursor-pointer" title="Sil"><Trash2 className="w-4 h-4" /></button>
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2 mt-2">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">{katOpt?.label || b.belgeKategorisi}</span>
+                            <span className={clsx('px-2 py-0.5 rounded text-[10px] font-medium', b.belgeKaynagi === 'uyap' ? 'bg-indigo-100 text-indigo-700' : b.belgeKaynagi === 'tarama' ? 'bg-cyan-100 text-cyan-700' : 'bg-slate-100 text-slate-600')}>{kaynakOpt?.label || b.belgeKaynagi}</span>
+                            <span className="text-[10px] text-slate-400">{fsize(b.dosyaBoyutu)}</span>
+                            <span className="text-[10px] text-slate-400">•</span>
+                            <span className="text-[10px] text-slate-400">{fd(b.createdAt)}</span>
+                            {b.uyapEvrakId && <><span className="text-[10px] text-slate-400">•</span><span className="text-[10px] text-indigo-500 font-mono">{b.uyapEvrakId}</span></>}
+                          </div>
+                          {b.aciklama && <p className="text-xs text-slate-600 mt-1.5 line-clamp-2">{b.aciklama}</p>}
+                          {b.etiketler.length > 0 && <div className="flex flex-wrap gap-1 mt-1.5">{b.etiketler.map((e, i) => <span key={i} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px]">#{e}</span>)}</div>}
+                        </div>
+                      </div>
+                    </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            );
+          })()}
+
           {/* OPERASYONEL TAKİP */}
           {activeTab === 'operasyonel' && (
             <div className="space-y-5">
@@ -400,8 +513,8 @@ export default function FoyUpdatePage({ params }: { params: Promise<{ id: string
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowModal(null)}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4" onClick={e => e.stopPropagation()}>
             <div className="p-5 border-b flex items-center justify-between">
-              <h3 className={clsx('font-semibold flex items-center gap-2', showModal === 'gorusme' ? 'text-emerald-700' : showModal === 'ziyaret' ? 'text-amber-700' : showModal === 'tahsilat' ? 'text-emerald-700' : 'text-blue-700')}>
-                {showModal === 'gorusme' ? <><MessageSquare className="w-5 h-5" /> Görüşme Ekle</> : showModal === 'ziyaret' ? <><Navigation className="w-5 h-5" /> Ziyaret Ekle</> : showModal === 'tahsilat' ? <><CircleDollarSign className="w-5 h-5" /> Tahsilat Ekle</> : <><Activity className="w-5 h-5" /> İşlem Ekle</>}
+              <h3 className={clsx('font-semibold flex items-center gap-2', showModal === 'gorusme' ? 'text-emerald-700' : showModal === 'ziyaret' ? 'text-amber-700' : showModal === 'tahsilat' ? 'text-emerald-700' : showModal === 'belge' ? 'text-blue-700' : 'text-blue-700')}>
+                {showModal === 'gorusme' ? <><MessageSquare className="w-5 h-5" /> Görüşme Ekle</> : showModal === 'ziyaret' ? <><Navigation className="w-5 h-5" /> Ziyaret Ekle</> : showModal === 'tahsilat' ? <><CircleDollarSign className="w-5 h-5" /> Tahsilat Ekle</> : showModal === 'belge' ? <><Upload className="w-5 h-5" /> Belge Ekle</> : <><Activity className="w-5 h-5" /> İşlem Ekle</>}
               </h3>
               <button onClick={() => setShowModal(null)} className="p-1 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-slate-400" /></button>
             </div>
@@ -413,7 +526,18 @@ export default function FoyUpdatePage({ params }: { params: Promise<{ id: string
               {(showModal === 'gorusme' || showModal === 'ziyaret') && <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Sonuç</label><select value={mForm.sonuc || ''} onChange={e => setMForm(p => ({ ...p, sonuc: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">{showModal === 'gorusme' ? [['olumlu','Olumlu'],['olumsuz','Olumsuz'],['belirsiz','Belirsiz']].map(([v,l]) => <option key={v} value={v}>{l}</option>) : [['gorusuldu','Görüşüldü'],['gorusulemedi','Görüşülemedi']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}</select></div>}
               {showModal === 'ziyaret' && <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Adres</label><input type="text" value={mForm.adres || ''} onChange={e => setMForm(p => ({ ...p, adres: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" /></div>}
               {showModal === 'islem' && <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">İşlem Tipi</label><select value={mForm.tip || 'not_eklendi'} onChange={e => setMForm(p => ({ ...p, tip: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">{[['not_eklendi','Not'],['borclu_gorusmesi','Görüşme'],['haciz_talebi_verildi','Haciz Talebi'],['tebligat_cikti','Tebligat'],['masraf_yapildi','Masraf'],['harc_yatirildi','Harç'],['diger','Diğer']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}</select></div>}
-              <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Açıklama</label><textarea rows={3} value={mForm.aciklama || ''} onChange={e => setMForm(p => ({ ...p, aciklama: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+              {showModal === 'belge' && <>
+                <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Belge Adı *</label><input type="text" value={mForm.belgeAdi || ''} onChange={e => setMForm(p => ({ ...p, belgeAdi: e.target.value }))} placeholder="ör. Ödeme Emri, Vekaletname..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+                <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Dosya Adı</label><input type="text" value={mForm.dosyaAdi || ''} onChange={e => setMForm(p => ({ ...p, dosyaAdi: e.target.value }))} placeholder="ör. odeme_emri.pdf" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Kategori</label><select value={mForm.kategori || 'diger'} onChange={e => setMForm(p => ({ ...p, kategori: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">{BELGE_KATEGORISI_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select></div>
+                  <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Kaynak</label><select value={mForm.kaynak || 'manuel'} onChange={e => setMForm(p => ({ ...p, kaynak: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">{BELGE_KAYNAGI_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select></div>
+                </div>
+                <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Etiketler (virgülle ayırın)</label><input type="text" value={mForm.etiketler || ''} onChange={e => setMForm(p => ({ ...p, etiketler: e.target.value }))} placeholder="ör. haciz, banka, ödeme emri" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+                <div className="flex items-center gap-2"><label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={mForm.onemli === 'true'} onChange={e => setMForm(p => ({ ...p, onemli: e.target.checked ? 'true' : 'false' }))} className="w-4 h-4 rounded border-slate-300 text-amber-600" /><span className="text-sm text-slate-700 flex items-center gap-1"><Star className="w-3.5 h-3.5 text-amber-500" /> Önemli belge olarak işaretle</span></label></div>
+              </>}
+              {showModal !== 'belge' && <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Açıklama</label><textarea rows={3} value={mForm.aciklama || ''} onChange={e => setMForm(p => ({ ...p, aciklama: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>}
+              {showModal === 'belge' && <div><label className="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Açıklama (opsiyonel)</label><textarea rows={2} value={mForm.aciklama || ''} onChange={e => setMForm(p => ({ ...p, aciklama: e.target.value }))} placeholder="Belge hakkında kısa not..." className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>}
             </div>
             <div className="p-5 border-t flex gap-3 justify-end">
               <button onClick={() => setShowModal(null)} className="px-4 py-2 bg-slate-100 rounded-xl text-sm font-medium hover:bg-slate-200">İptal</button>

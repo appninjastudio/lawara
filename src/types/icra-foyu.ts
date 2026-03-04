@@ -513,6 +513,69 @@ export interface YerindeZiyaret {
   createdBy: number;
 }
 
+// ─── TABLE: documents (BELGELER - UYAP ÖNEMLİ BELGELER) ─────────────────────
+
+export type BelgeKategorisi =
+  | 'odeme_emri'          // Ödeme emri
+  | 'icra_emri'           // İcra emri
+  | 'takip_talebi'        // Takip talebi
+  | 'ilamlar'             // Mahkeme ilamları / kararları
+  | 'vekaletname'         // Vekaletname
+  | 'tebligat'            // Tebligat evrakları
+  | 'haciz_tutanagi'      // Haciz tutanakları
+  | 'haciz_ihbarnamesi'   // 89/1, 89/2, 89/3 ihbarnameleri
+  | 'kiymet_takdiri'      // Kıymet takdir raporu
+  | 'satis_ilani'         // Satış ilanı
+  | 'bilirkisi_raporu'    // Bilirkişi raporu
+  | 'itiraz_dilekce'      // İtiraz dilekçesi
+  | 'itiraz_kaldirma'     // İtirazın kaldırılması
+  | 'taahhut'             // Taahhüt belgesi
+  | 'banka_cevabi'        // Banka cevap yazısı
+  | 'sgk_cevabi'          // SGK cevap yazısı
+  | 'tapu_cevabi'         // Tapu cevap yazısı
+  | 'maaş_haczi_muzakkere' // Maaş haczi müzekkeresi
+  | 'dekont'              // Ödeme dekontları
+  | 'sozlesme'            // Sözleşme/kredi sözleşmesi
+  | 'senet'               // Senet, bono, çek
+  | 'diger';              // Diğer belgeler
+
+export type BelgeKaynagi =
+  | 'uyap'                // UYAP'tan indirilen
+  | 'manuel'              // Manuel yüklenen
+  | 'tarama'              // Taranmış belge
+  | 'email'               // E-posta eki
+  | 'diger';              // Diğer
+
+export interface Belge {
+  id: number;
+  dosyaId: number;
+  // Belge bilgileri
+  belgeAdi: string;                   // Belge başlığı (görünen ad)
+  dosyaAdi: string;                   // Orijinal dosya adı (filename.pdf)
+  belgeKategorisi: BelgeKategorisi;   // Belge kategorisi
+  belgeKaynagi: BelgeKaynagi;         // Nereden geldi
+  // Dosya bilgileri
+  dosyaBoyutu: number;                // Byte cinsinden
+  dosyaTipi: string;                  // MIME type (application/pdf, image/jpeg vb.)
+  dosyaUzantisi: string;              // .pdf, .docx, .jpg vb.
+  // UYAP bilgileri
+  uyapEvrakId: string | null;         // UYAP evrak ID
+  uyapEvrakTuru: string | null;       // UYAP evrak türü
+  uyapIndirmeTarihi: string | null;   // UYAP'tan indirilme tarihi
+  // İçerik
+  aciklama: string | null;            // Belge açıklaması
+  onemliMi: boolean;                  // Önemli/yıldızlı belge
+  etiketler: string[];                // Etiketler (arama için)
+  // Depolama
+  depolamaYolu: string | null;        // Dosya yolu veya URL
+  onizlemeUrl: string | null;         // Küçük resim / önizleme URL
+  // Meta
+  yukleyenKisi: string;               // Yükleyen kişi adı
+  yukleyenKisiId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ─── BÜTÜN FOY BİRLEŞİK YAPISI (İcra Föyü Tam Görünüm) ───────────────────
 
 export interface IcraFoyu {
@@ -527,6 +590,7 @@ export interface IcraFoyu {
   operasyonelTakip: OperasyonelTakip;
   gorusmeler: BorcluGorusmesi[];
   ziyaretler: YerindeZiyaret[];
+  belgeler: Belge[];
 }
 
 // ─── HESAPLANAN (COMPUTED) ALANLAR ─────────────────────────────────────────
@@ -671,4 +735,37 @@ export const ISLEM_TIPI_OPTIONS: { value: IslemTipi; label: string; icon: string
   { value: 'uyap_sorgusu', label: 'UYAP Sorgusu', icon: 'Search' },
   { value: 'not_eklendi', label: 'Not Eklendi', icon: 'StickyNote' },
   { value: 'diger', label: 'Diğer', icon: 'MoreHorizontal' },
+];
+
+export const BELGE_KATEGORISI_OPTIONS: { value: BelgeKategorisi; label: string; icon: string }[] = [
+  { value: 'odeme_emri', label: 'Ödeme Emri', icon: 'FileText' },
+  { value: 'icra_emri', label: 'İcra Emri', icon: 'FileText' },
+  { value: 'takip_talebi', label: 'Takip Talebi', icon: 'FilePlus' },
+  { value: 'ilamlar', label: 'Mahkeme İlamı / Kararı', icon: 'Gavel' },
+  { value: 'vekaletname', label: 'Vekaletname', icon: 'FileSignature' },
+  { value: 'tebligat', label: 'Tebligat Evrakı', icon: 'Mail' },
+  { value: 'haciz_tutanagi', label: 'Haciz Tutanağı', icon: 'Shield' },
+  { value: 'haciz_ihbarnamesi', label: 'Haciz İhbarnamesi (89/1-2-3)', icon: 'ShieldAlert' },
+  { value: 'kiymet_takdiri', label: 'Kıymet Takdir Raporu', icon: 'Calculator' },
+  { value: 'satis_ilani', label: 'Satış İlanı', icon: 'ShoppingCart' },
+  { value: 'bilirkisi_raporu', label: 'Bilirkişi Raporu', icon: 'ClipboardCheck' },
+  { value: 'itiraz_dilekce', label: 'İtiraz Dilekçesi', icon: 'ShieldAlert' },
+  { value: 'itiraz_kaldirma', label: 'İtirazın Kaldırılması', icon: 'ShieldCheck' },
+  { value: 'taahhut', label: 'Taahhüt Belgesi', icon: 'FileSignature' },
+  { value: 'banka_cevabi', label: 'Banka Cevap Yazısı', icon: 'Building2' },
+  { value: 'sgk_cevabi', label: 'SGK Cevap Yazısı', icon: 'Building2' },
+  { value: 'tapu_cevabi', label: 'Tapu Cevap Yazısı', icon: 'Landmark' },
+  { value: 'maaş_haczi_muzakkere', label: 'Maaş Haczi Müzekkeresi', icon: 'Banknote' },
+  { value: 'dekont', label: 'Ödeme Dekontu', icon: 'Receipt' },
+  { value: 'sozlesme', label: 'Sözleşme / Kredi Sözleşmesi', icon: 'FileText' },
+  { value: 'senet', label: 'Senet / Bono / Çek', icon: 'CreditCard' },
+  { value: 'diger', label: 'Diğer', icon: 'File' },
+];
+
+export const BELGE_KAYNAGI_OPTIONS: { value: BelgeKaynagi; label: string }[] = [
+  { value: 'uyap', label: 'UYAP\'tan İndirildi' },
+  { value: 'manuel', label: 'Manuel Yüklendi' },
+  { value: 'tarama', label: 'Taranmış Belge' },
+  { value: 'email', label: 'E-posta Eki' },
+  { value: 'diger', label: 'Diğer' },
 ];
