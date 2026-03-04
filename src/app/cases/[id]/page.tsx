@@ -248,10 +248,17 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
           <div className="flex items-center gap-3">
             <a
               href={`/cases/${id}/foy`}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-sm font-medium hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/25"
+            >
+              <Eye className="w-4 h-4" />
+              Föy&apos;e Göz At
+            </a>
+            <a
+              href={`/cases/${id}/foy/edit`}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-xl text-sm font-medium hover:from-rose-600 hover:to-pink-700 transition-all shadow-md shadow-rose-500/25"
             >
               <FileText className="w-4 h-4" />
-              Föy Güncelle
+              Föy Düzenle
             </a>
             <span className={clsx('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium', sc.color)}>
               <StatusIcon className="w-4 h-4" />
