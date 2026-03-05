@@ -41,7 +41,7 @@ interface CaseItem {
 }
 
 const statusConfig = {
-  active: { label: 'Aktif', color: 'bg-blue-100 text-blue-700' },
+  active: { label: 'Aktif', color: 'bg-icra-light/15 text-icra-dark' },
   pending: { label: 'Beklemede', color: 'bg-amber-100 text-amber-700' },
   completed: { label: 'Tamamlandı', color: 'bg-emerald-100 text-emerald-700' },
   warning: { label: 'Dikkat', color: 'bg-red-100 text-red-700' },
@@ -284,7 +284,7 @@ export default function CasesPage() {
           <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-slate-100">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Search className="w-5 h-5 text-indigo-600" />
+                <Search className="w-5 h-5 text-icra-mid" />
                 <h3 className="font-semibold text-slate-900">Sorgulama</h3>
               </div>
               <div className="flex items-center gap-3">
@@ -297,7 +297,7 @@ export default function CasesPage() {
                 </button>
                 <button
                   onClick={openNewCaseModal}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-sm font-medium text-white hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-icra-dark to-icra-mid rounded-xl text-sm font-medium text-white hover:from-icra-darkest hover:to-icra-dark transition-all shadow-lg shadow-icra-mid/25"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Yeni Dosya</span>
@@ -441,8 +441,8 @@ export default function CasesPage() {
               <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-100">
                 <span className="text-xs text-slate-500 font-medium">Aktif Filtreler:</span>
                 {activeFilters.map((f, i) => (
-                  <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg text-xs font-medium">
-                    <span className="text-indigo-500">{f.label}:</span> {f.value}
+                  <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1 bg-icra-light/10 border border-icra-light/30 text-icra-dark rounded-lg text-xs font-medium">
+                    <span className="text-icra-mid">{f.label}:</span> {f.value}
                     <button
                       onClick={() => {
                         setActiveFilters(prev => prev.filter((_, idx) => idx !== i));
@@ -465,15 +465,15 @@ export default function CasesPage() {
 
         {/* Selected Actions */}
         {selectedCases.length > 0 && (
-          <div className="flex items-center gap-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-            <span className="text-sm font-medium text-blue-700">
+          <div className="flex items-center gap-4 p-4 bg-icra-light/10 border border-icra-light/30 rounded-xl">
+            <span className="text-sm font-medium text-icra-dark">
               {selectedCases.length} dosya seçildi
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handleBulkAction('uyap')}
                 disabled={bulkLoading !== null}
-                className="px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+                className="px-3 py-1.5 text-sm font-medium text-icra-dark hover:bg-icra-light/10 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
               >
                 {bulkLoading === 'uyap' && <Loader2 className="w-3 h-3 animate-spin" />}
                 Toplu UYAP Sorgusu
@@ -481,7 +481,7 @@ export default function CasesPage() {
               <button
                 onClick={() => handleBulkAction('sms')}
                 disabled={bulkLoading !== null}
-                className="px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+                className="px-3 py-1.5 text-sm font-medium text-icra-dark hover:bg-icra-light/10 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
               >
                 {bulkLoading === 'sms' && <Loader2 className="w-3 h-3 animate-spin" />}
                 SMS Gönder
@@ -502,7 +502,7 @@ export default function CasesPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+              <Loader2 className="w-8 h-8 text-icra-mid animate-spin" />
               <span className="ml-3 text-slate-500">Yükleniyor...</span>
             </div>
           ) : cases.length === 0 ? (
@@ -522,7 +522,7 @@ export default function CasesPage() {
                           type="checkbox"
                           checked={selectedCases.length === cases.length && cases.length > 0}
                           onChange={toggleSelectAll}
-                          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          className="w-4 h-4 rounded border-slate-300 text-icra-mid focus:ring-icra-mid"
                         />
                       </th>
                       <th className="px-6 py-4 text-left">
@@ -546,7 +546,7 @@ export default function CasesPage() {
                         key={c.id} 
                         className={clsx(
                           'hover:bg-slate-50 transition-colors',
-                          selectedCases.includes(c.id) && 'bg-blue-50'
+                          selectedCases.includes(c.id) && 'bg-icra-light/5'
                         )}
                       >
                         <td className="px-6 py-4">
@@ -554,7 +554,7 @@ export default function CasesPage() {
                             type="checkbox"
                             checked={selectedCases.includes(c.id)}
                             onChange={() => toggleSelect(c.id)}
-                            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                            className="w-4 h-4 rounded border-slate-300 text-icra-mid focus:ring-icra-mid"
                           />
                         </td>
                         <td className="px-6 py-4">
@@ -594,7 +594,7 @@ export default function CasesPage() {
                         <td className="px-6 py-4 text-sm text-slate-600">{c.court.name}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-end gap-1">
-                            <a href={`/cases/${c.id}`} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            <a href={`/cases/${c.id}`} className="p-2 text-slate-400 hover:text-icra-mid hover:bg-icra-light/10 rounded-lg transition-colors">
                               <Eye className="w-4 h-4" />
                             </a>
                             <button
@@ -638,7 +638,7 @@ export default function CasesPage() {
                         onClick={() => setPage(pageNum)}
                         className={clsx(
                           'px-3 py-1.5 text-sm font-medium rounded-lg',
-                          page === pageNum ? 'text-white bg-blue-600' : 'text-slate-600 hover:bg-slate-100'
+                          page === pageNum ? 'text-white bg-icra-mid' : 'text-slate-600 hover:bg-slate-100'
                         )}
                       >
                         {pageNum}
@@ -714,7 +714,7 @@ export default function CasesPage() {
                     placeholder="2024/1250"
                     value={newCaseForm.caseNumber}
                     onChange={e => setNewCaseForm(f => ({ ...f, caseNumber: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                   />
                 </div>
                 <div>
@@ -724,7 +724,7 @@ export default function CasesPage() {
                     placeholder="Y101"
                     value={newCaseForm.foyNumber}
                     onChange={e => setNewCaseForm(f => ({ ...f, foyNumber: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                   />
                 </div>
               </div>
@@ -734,7 +734,7 @@ export default function CasesPage() {
                 <select
                   value={newCaseForm.debtorId}
                   onChange={e => setNewCaseForm(f => ({ ...f, debtorId: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 >
                   <option value="">Borçlu seçin...</option>
                   {lookups?.debtors.map(d => (
@@ -748,7 +748,7 @@ export default function CasesPage() {
                 <select
                   value={newCaseForm.creditorId}
                   onChange={e => setNewCaseForm(f => ({ ...f, creditorId: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 >
                   <option value="">Alacaklı seçin...</option>
                   {lookups?.creditors.map(c => (
@@ -762,7 +762,7 @@ export default function CasesPage() {
                 <select
                   value={newCaseForm.courtId}
                   onChange={e => setNewCaseForm(f => ({ ...f, courtId: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 >
                   <option value="">İcra dairesi seçin...</option>
                   {lookups?.courts.map(c => (
@@ -779,7 +779,7 @@ export default function CasesPage() {
                     placeholder="50000"
                     value={newCaseForm.principalAmount}
                     onChange={e => setNewCaseForm(f => ({ ...f, principalAmount: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                   />
                 </div>
                 <div>
@@ -789,7 +789,7 @@ export default function CasesPage() {
                     placeholder="0"
                     value={newCaseForm.interestAmount}
                     onChange={e => setNewCaseForm(f => ({ ...f, interestAmount: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                   />
                 </div>
                 <div>
@@ -797,7 +797,7 @@ export default function CasesPage() {
                   <select
                     value={newCaseForm.caseType}
                     onChange={e => setNewCaseForm(f => ({ ...f, caseType: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                   >
                     <option value="ilamsiz">İlamsız</option>
                     <option value="ilamli">İlamlı</option>
@@ -844,7 +844,7 @@ export default function CasesPage() {
                 <select
                   value={editForm.status}
                   onChange={e => setEditForm(f => ({ ...f, status: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 >
                   {Object.entries(statusConfig).map(([key, val]) => (
                     <option key={key} value={key}>{val.label}</option>
@@ -857,7 +857,7 @@ export default function CasesPage() {
                   type="number"
                   value={editForm.principalAmount}
                   onChange={e => setEditForm(f => ({ ...f, principalAmount: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 />
               </div>
               <div>
@@ -866,7 +866,7 @@ export default function CasesPage() {
                   type="number"
                   value={editForm.interestAmount}
                   onChange={e => setEditForm(f => ({ ...f, interestAmount: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 />
               </div>
             </div>

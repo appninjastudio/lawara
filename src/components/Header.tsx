@@ -22,7 +22,7 @@ export default function Header({ title, subtitle }: HeaderProps) {
           <input
             type="text"
             placeholder="Dosya ara..."
-            className="w-64 pl-10 pr-4 py-2 bg-slate-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+            className="w-64 pl-10 pr-4 py-2 bg-slate-100 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-icra-light focus:bg-white transition-all"
           />
         </div>
 
@@ -35,7 +35,7 @@ export default function Header({ title, subtitle }: HeaderProps) {
         {/* Messages */}
         <button className="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
           <MessageSquare className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+          <span className="absolute top-1 right-1 w-2 h-2 bg-icra-light rounded-full"></span>
         </button>
       </div>
     </header>

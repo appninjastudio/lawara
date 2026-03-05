@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
+@theme {
+  --color-icra-darkest: #00171F;
+  --color-icra-dark: #003459;
+  --color-icra-mid: #007EA7;
+  --color-icra-light: #00A8E8;
+  --color-icra-white: #FFFFFF;
+}
+
 :root {
   --background: #f8fafc;
-  --foreground: #0f172a;
+  --foreground: #00171F;
 }
 
 * {

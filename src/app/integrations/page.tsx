@@ -59,7 +59,7 @@ const statusConfig = {
 
 const buyaparActions = [
   { id: 1, name: 'Tüm Hızlı İşlemler', count: 8508, color: 'bg-orange-500', icon: Zap },
-  { id: 2, name: 'Maaş Haczi', count: 482, color: 'bg-blue-500', icon: Banknote },
+  { id: 2, name: 'Maaş Haczi', count: 482, color: 'bg-icra-mid', icon: Banknote },
   { id: 3, name: 'Taşınmaz Haczi', count: 4051, color: 'bg-emerald-500', icon: Building2 },
   { id: 4, name: 'Araç Haczi', count: null, color: 'bg-cyan-500', icon: Car },
   { id: 5, name: 'Posta Çeki Haczi', count: null, color: 'bg-violet-500', icon: Mail },
@@ -68,7 +68,7 @@ const buyaparActions = [
   { id: 8, name: 'SGK Mesajı', count: 4004, color: 'bg-teal-500', icon: FileCheck },
   { id: 9, name: "21'e Göre Tebliğ", count: 1, color: 'bg-rose-500', icon: Mail },
   { id: 10, name: 'Reddiyat', count: null, color: 'bg-red-500', icon: XCircle },
-  { id: 11, name: 'Evrak Kutusu', count: null, color: 'bg-indigo-500', icon: Inbox },
+  { id: 11, name: 'Evrak Kutusu', count: null, color: 'bg-icra-dark', icon: Inbox },
 ];
 
 const buyaparMockResults: Record<number, { description: string; items: { caseId: string; debtor: string; detail: string; status: string }[] }> = {
@@ -181,8 +181,8 @@ export default function IntegrationsPage() {
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <Link2 className="w-6 h-6 text-blue-600" />
+                <div className="p-3 bg-icra-light/15 rounded-xl">
+                  <Link2 className="w-6 h-6 text-icra-mid" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900">UYAP Bağlantısı</h3>
@@ -203,7 +203,7 @@ export default function IntegrationsPage() {
               <button
                 onClick={handleSync}
                 disabled={syncLoading}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-icra-mid hover:bg-icra-light/10 rounded-lg transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${syncLoading ? 'animate-spin' : ''}`} />
                 {syncLoading ? 'Senkronize ediliyor...' : 'Senkronize Et'}
@@ -387,7 +387,7 @@ export default function IntegrationsPage() {
                 <input
                   type="text"
                   placeholder="Ara..."
-                  className="w-48 pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-48 pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 />
               </div>
               <button className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
@@ -421,7 +421,7 @@ export default function IntegrationsPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-slate-900">{log.action}</span>
-                          <span className="text-xs text-blue-600 font-medium">{log.caseId}</span>
+                          <span className="text-xs text-icra-mid font-medium">{log.caseId}</span>
                         </div>
                         <p className="text-sm text-slate-500 mt-0.5">{log.details}</p>
                       </div>
@@ -466,7 +466,7 @@ export default function IntegrationsPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-slate-900">{log.message}</span>
-                          <span className="text-xs text-blue-600 font-medium">{log.caseId}</span>
+                          <span className="text-xs text-icra-mid font-medium">{log.caseId}</span>
                         </div>
                         <p className="text-sm text-slate-500 mt-0.5">Alıcı: {log.recipient}</p>
                       </div>
@@ -581,7 +581,7 @@ export default function IntegrationsPage() {
                         )} />
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-blue-600">{item.caseId}</span>
+                            <span className="text-sm font-semibold text-icra-mid">{item.caseId}</span>
                             <span className="text-sm text-slate-700">{item.debtor}</span>
                           </div>
                           <p className="text-xs text-slate-500 mt-0.5">{item.detail}</p>

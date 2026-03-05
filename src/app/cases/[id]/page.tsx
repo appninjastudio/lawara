@@ -109,7 +109,7 @@ interface CaseDetail {
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: typeof CheckCircle2 }> = {
-  active: { label: 'Aktif', color: 'bg-blue-100 text-blue-700', icon: Clock },
+  active: { label: 'Aktif', color: 'bg-icra-light/15 text-icra-dark', icon: Clock },
   pending: { label: 'Beklemede', color: 'bg-amber-100 text-amber-700', icon: Clock },
   completed: { label: 'Tamamlandı', color: 'bg-emerald-100 text-emerald-700', icon: CheckCircle2 },
   closed: { label: 'Kapatıldı', color: 'bg-slate-100 text-slate-700', icon: XCircle },
@@ -121,14 +121,14 @@ const typeLabels: Record<string, string> = {
 };
 
 const noteTypeConfig: Record<string, { label: string; color: string }> = {
-  note: { label: 'Not', color: 'bg-blue-100 text-blue-700' },
+  note: { label: 'Not', color: 'bg-icra-light/15 text-icra-dark' },
   warning: { label: 'Uyarı', color: 'bg-red-100 text-red-700' },
   reminder: { label: 'Hatırlatma', color: 'bg-amber-100 text-amber-700' },
 };
 
 const notifStatusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Bekliyor', color: 'bg-amber-100 text-amber-700' },
-  sent: { label: 'Gönderildi', color: 'bg-blue-100 text-blue-700' },
+  sent: { label: 'Gönderildi', color: 'bg-icra-light/15 text-icra-dark' },
   delivered: { label: 'Teslim Edildi', color: 'bg-emerald-100 text-emerald-700' },
   failed: { label: 'Başarısız', color: 'bg-red-100 text-red-700' },
 };
@@ -198,7 +198,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
       <div className="flex flex-col h-full">
         <Header title="Dosya Detayı" subtitle="Yükleniyor..." />
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+          <Loader2 className="w-8 h-8 text-icra-mid animate-spin" />
         </div>
       </div>
     );
@@ -211,7 +211,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
         <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
           <FileText className="w-16 h-16 mb-4" />
           <p className="text-xl font-medium">Dosya bulunamadı</p>
-          <a href="/cases" className="mt-4 text-blue-600 hover:underline">Dosya listesine dön</a>
+          <a href="/cases" className="mt-4 text-icra-mid hover:underline">Dosya listesine dön</a>
         </div>
       </div>
     );
@@ -248,14 +248,14 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
           <div className="flex items-center gap-3">
             <a
               href={`/cases/${id}/foy`}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-sm font-medium hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/25"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-icra-dark to-icra-mid text-white rounded-xl text-sm font-medium hover:from-icra-darkest hover:to-icra-dark transition-all shadow-md shadow-icra-mid/25"
             >
               <Eye className="w-4 h-4" />
               Föy&apos;e Göz At
             </a>
             <a
               href={`/cases/${id}/foy/edit`}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-xl text-sm font-medium hover:from-rose-600 hover:to-pink-700 transition-all shadow-md shadow-rose-500/25"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-icra-mid to-icra-light text-white rounded-xl text-sm font-medium hover:from-icra-dark hover:to-icra-mid transition-all shadow-md shadow-icra-light/25"
             >
               <FileText className="w-4 h-4" />
               Föy Düzenle
@@ -282,7 +282,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
           </div>
           <div className="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Toplam Tutar</p>
-            <p className="text-2xl font-bold text-blue-600">{formatCurrency(caseData.totalAmount)}</p>
+            <p className="text-2xl font-bold text-icra-dark">{formatCurrency(caseData.totalAmount)}</p>
           </div>
           <div className="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Tahsilat</p>
@@ -301,7 +301,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                 className={clsx(
                   'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap',
                   activeTab === tab.key
-                    ? 'border-blue-600 text-blue-600'
+                    ? 'border-icra-mid text-icra-dark'
                     : 'border-transparent text-slate-500 hover:text-slate-700'
                 )}
               >
@@ -333,7 +333,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
             {/* Alacaklı */}
             <div className="bg-white rounded-xl border border-slate-100 p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-blue-100 rounded-lg"><Building2 className="w-5 h-5 text-blue-600" /></div>
+                <div className="p-2 bg-icra-light/15 rounded-lg"><Building2 className="w-5 h-5 text-icra-mid" /></div>
                 <h3 className="text-lg font-semibold text-slate-900">Alacaklı Bilgileri</h3>
               </div>
               <div className="space-y-3">
@@ -436,7 +436,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                     <p className="text-sm text-slate-500">Başlangıç: {formatDate(c.startDate)}</p>
                   </div>
                   <span className={clsx('px-3 py-1 rounded-full text-xs font-medium',
-                    c.status === 'active' ? 'bg-blue-100 text-blue-700' :
+                    c.status === 'active' ? 'bg-icra-light/15 text-icra-dark' :
                     c.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
                     'bg-red-100 text-red-700'
                   )}>
@@ -444,7 +444,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                   </span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2 mb-4">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${(c.paidCount / c.installmentCount) * 100}%` }} />
+                  <div className="bg-icra-mid h-2 rounded-full" style={{ width: `${(c.paidCount / c.installmentCount) * 100}%` }} />
                 </div>
                 <p className="text-xs text-slate-500 mb-4">{c.paidCount}/{c.installmentCount} taksit ödendi</p>
                 {c.installments.length > 0 && (
@@ -479,7 +479,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                 <select
                   value={noteType}
                   onChange={e => setNoteType(e.target.value)}
-                  className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 >
                   <option value="note">Not</option>
                   <option value="warning">Uyarı</option>
@@ -492,12 +492,12 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                   onChange={e => setNewNote(e.target.value)}
                   placeholder="Yeni not ekle..."
                   rows={2}
-                  className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 />
                 <button
                   onClick={handleAddNote}
                   disabled={addingNote || !newNote.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors self-end"
+                  className="px-4 py-2 bg-icra-mid text-white rounded-lg text-sm font-medium hover:bg-icra-dark disabled:opacity-50 transition-colors self-end"
                 >
                   {addingNote ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 </button>
@@ -572,7 +572,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
             {/* Haciz Özet Kartları */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
               {[
-                { type: 'bank', label: 'Banka', icon: Banknote, color: 'bg-blue-100 text-blue-700' },
+                { type: 'bank', label: 'Banka', icon: Banknote, color: 'bg-icra-light/15 text-icra-dark' },
                 { type: 'vehicle', label: 'Araç', icon: Car, color: 'bg-cyan-100 text-cyan-700' },
                 { type: 'property', label: 'Taşınmaz', icon: Home, color: 'bg-emerald-100 text-emerald-700' },
                 { type: 'salary', label: 'Maaş', icon: Briefcase, color: 'bg-purple-100 text-purple-700' },
@@ -597,7 +597,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
             ) : caseData.seizures.map(seizure => {
               const isExpanded = expandedSeizure === seizure.id;
               const typeConfig: Record<string, { label: string; icon: typeof Shield; color: string }> = {
-                bank: { label: 'Banka Haczi', icon: Banknote, color: 'bg-blue-100 text-blue-700' },
+                bank: { label: 'Banka Haczi', icon: Banknote, color: 'bg-icra-light/15 text-icra-dark' },
                 vehicle: { label: 'Araç Haczi', icon: Car, color: 'bg-cyan-100 text-cyan-700' },
                 property: { label: 'Taşınmaz Haczi', icon: Home, color: 'bg-emerald-100 text-emerald-700' },
                 salary: { label: 'Maaş Haczi', icon: Briefcase, color: 'bg-purple-100 text-purple-700' },
@@ -721,7 +721,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
               </div>
             ) : caseData.lawsuits.map(lawsuit => {
               const isExpanded = expandedLawsuit === lawsuit.id;
-              const lawStatusColor = lawsuit.status === 'active' ? 'bg-blue-100 text-blue-700' : lawsuit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700';
+              const lawStatusColor = lawsuit.status === 'active' ? 'bg-icra-light/15 text-icra-dark' : lawsuit.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700';
               const lawStatusLabel = lawsuit.status === 'active' ? 'Devam Ediyor' : lawsuit.status === 'completed' ? 'Sonuçlandı' : lawsuit.status;
 
               return (
@@ -731,7 +731,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                     className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors text-left"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="p-2.5 bg-indigo-100 rounded-xl"><Gavel className="w-5 h-5 text-indigo-700" /></div>
+                      <div className="p-2.5 bg-icra-light/15 rounded-xl"><Gavel className="w-5 h-5 text-icra-dark" /></div>
                       <div>
                         <h4 className="font-semibold text-slate-900">{lawsuit.subject}</h4>
                         <p className="text-sm text-slate-500 mt-0.5">{lawsuit.courtName} — {lawsuit.caseNumber}</p>
@@ -764,7 +764,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                           {lawsuit.requestedPenalty && <div className="flex justify-between"><span className="text-sm text-slate-500">Talep</span><span className="text-sm font-medium text-red-600">{lawsuit.requestedPenalty}</span></div>}
                           {lawsuit.result && <div className="flex justify-between"><span className="text-sm text-slate-500">Sonuç</span><span className="text-sm font-bold text-emerald-600 text-right max-w-[65%]">{lawsuit.result}</span></div>}
                         </div>
-                        <div className="col-span-full p-3 bg-indigo-50 rounded-lg text-sm text-indigo-800">{lawsuit.description}</div>
+                        <div className="col-span-full p-3 bg-icra-light/10 rounded-lg text-sm text-icra-darkest">{lawsuit.description}</div>
                       </div>
 
                       {/* Duruşmalar */}
@@ -774,7 +774,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                           <div className="space-y-3">
                             {lawsuit.hearings.map(h => (
                               <div key={h.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                                <div className="w-2 h-2 mt-2 rounded-full bg-indigo-500 shrink-0" />
+                                <div className="w-2 h-2 mt-2 rounded-full bg-icra-mid shrink-0" />
                                 <div className="flex-1">
                                   <div className="flex items-center justify-between">
                                     <span className="text-sm font-medium text-slate-900">{h.type}</span>
@@ -796,7 +796,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                             {lawsuit.documents.map(doc => (
                               <div key={doc.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
-                                <FileText className="w-4 h-4 text-indigo-500 shrink-0" />
+                                <FileText className="w-4 h-4 text-icra-mid shrink-0" />
                                 <div className="min-w-0 flex-1">
                                   <p className="text-sm font-medium text-slate-900 truncate">{doc.name}</p>
                                   <p className="text-xs text-slate-500">{formatDate(doc.date)}</p>
@@ -847,14 +847,14 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                       };
                       const tebStatusConfig: Record<string, { label: string; color: string }> = {
                         delivered: { label: 'Teslim Edildi', color: 'bg-emerald-100 text-emerald-700' },
-                        sent: { label: 'Gönderildi', color: 'bg-blue-100 text-blue-700' },
+                        sent: { label: 'Gönderildi', color: 'bg-icra-light/15 text-icra-dark' },
                         pending: { label: 'Bekliyor', color: 'bg-amber-100 text-amber-700' },
                         failed: { label: 'Başarısız', color: 'bg-red-100 text-red-700' },
                       };
                       const ts = tebStatusConfig[t.status] || { label: t.status, color: 'bg-slate-100 text-slate-700' };
                       return (
                         <tr key={t.id} className="hover:bg-slate-50">
-                          <td className="px-5 py-3"><span className="px-2 py-1 bg-indigo-50 text-indigo-700 rounded text-xs font-medium">{tebTypeLabels[t.type] || t.type}</span></td>
+                          <td className="px-5 py-3"><span className="px-2 py-1 bg-icra-light/10 text-icra-dark rounded text-xs font-medium">{tebTypeLabels[t.type] || t.type}</span></td>
                           <td className="px-5 py-3 text-sm font-medium text-slate-900">{t.recipient}</td>
                           <td className="px-5 py-3 text-sm text-slate-600 max-w-[200px] truncate" title={t.address}>{t.address}</td>
                           <td className="px-5 py-3 text-sm text-slate-600">{formatDate(t.sentDate)}</td>
@@ -984,14 +984,14 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
           return (
             <div className="space-y-4">
               {/* Bilgi Kartı */}
-              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100 p-5">
+              <div className="bg-gradient-to-r from-icra-light/5 to-icra-light/10 rounded-xl border border-icra-light/20 p-5">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-indigo-100 rounded-xl"><FileCode className="w-6 h-6 text-indigo-600" /></div>
+                  <div className="p-3 bg-icra-light/15 rounded-xl"><FileCode className="w-6 h-6 text-icra-mid" /></div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-slate-900">UYAP Takip Açma XML</h3>
                     <p className="text-sm text-slate-600 mt-1">Bu dosyayı indirip UYAP portalına yükleyerek doğrudan icra takibi açabilirsiniz. XML dosyası tüm borçlu, alacaklı, haciz ve dava bilgilerini içerir.</p>
                     <div className="flex items-center gap-3 mt-4">
-                      <button onClick={handleDownloadXml} className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                      <button onClick={handleDownloadXml} className="flex items-center gap-2 px-4 py-2.5 bg-icra-mid text-white rounded-xl text-sm font-medium hover:bg-icra-dark transition-colors shadow-sm">
                         <Download className="w-4 h-4" />
                         XML İndir
                       </button>
@@ -1006,7 +1006,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
               {/* XML Özet */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm text-center">
-                  <Scale className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
+                  <Scale className="w-5 h-5 text-icra-mid mx-auto mb-1" />
                   <p className="text-lg font-bold text-slate-900">{caseData.caseType === 'ilamsiz' ? 'İlamsız' : caseData.caseType === 'ilamli' ? 'İlamlı' : 'Kambiyo'}</p>
                   <p className="text-xs text-slate-500">Takip Türü</p>
                 </div>

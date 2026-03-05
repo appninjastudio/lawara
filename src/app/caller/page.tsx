@@ -138,8 +138,8 @@ export default function CallerPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <PhoneCall className="w-5 h-5 text-blue-600" />
+                <div className="p-2 bg-icra-light/15 rounded-lg">
+                  <PhoneCall className="w-5 h-5 text-icra-mid" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">Tek Arama Başlat</h3>
               </div>
@@ -151,7 +151,7 @@ export default function CallerPage() {
                     value={singlePhone}
                     onChange={(e) => setSinglePhone(e.target.value)}
                     placeholder="05xx xxx xx xx"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                   />
                 </div>
 
@@ -162,7 +162,7 @@ export default function CallerPage() {
                     onChange={(e) => setSingleTts(e.target.value)}
                     placeholder="Sayın ... icra dosyanızda ..."
                     rows={5}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                   />
                 </div>
 
@@ -170,8 +170,8 @@ export default function CallerPage() {
                   onClick={doSingleCall}
                   disabled={singleLoading}
                   className={clsx(
-                    'w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl transition-all',
-                    singleLoading ? 'opacity-70 cursor-not-allowed' : 'hover:from-blue-700 hover:to-indigo-700'
+                    'w-full py-3 bg-gradient-to-r from-icra-dark to-icra-mid text-white font-medium rounded-xl transition-all',
+                    singleLoading ? 'opacity-70 cursor-not-allowed' : 'hover:from-icra-darkest hover:to-icra-dark'
                   )}
                 >
                   {singleLoading ? 'Aranıyor...' : 'Aramayı Başlat'}
@@ -244,7 +244,7 @@ export default function CallerPage() {
                     onChange={(e) => setBulkPhones(e.target.value)}
                     placeholder="05xx...\n05xx...\nveya virgülle"
                     rows={6}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                   />
                   <p className="text-xs text-slate-500 mt-1">Yeni satır / virgül / noktalı virgül ile ayırabilirsiniz.</p>
                 </div>
@@ -256,7 +256,7 @@ export default function CallerPage() {
                     onChange={(e) => setBulkTts(e.target.value)}
                     placeholder="Sayın ... icra dosyanızda ..."
                     rows={5}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                   />
                 </div>
 
@@ -315,7 +315,7 @@ export default function CallerPage() {
                     value={callId}
                     onChange={(e) => setCallId(e.target.value)}
                     placeholder="call_id"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                   />
                 </div>
 
@@ -383,7 +383,7 @@ export default function CallerPage() {
             <tbody className="divide-y divide-slate-100">
               {callHistory.map(call => (
                 <tr key={call.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-3 text-sm font-mono text-blue-600 cursor-pointer" onClick={() => { setCallId(call.id); setActiveTab('status'); }}>
+                  <td className="px-6 py-3 text-sm font-mono text-icra-mid cursor-pointer" onClick={() => { setCallId(call.id); setActiveTab('status'); }}>
                     {call.id}
                   </td>
                   <td className="px-6 py-3 text-sm text-slate-600">{call.phone}</td>

@@ -99,7 +99,7 @@ export default function FinancePage() {
   const reportTypes = [
     { id: 'ihtarname', label: 'İhtarname', desc: 'Borçluya ödeme yapması için resmi uyarı', icon: '📄', color: 'bg-amber-50 border-amber-200 text-amber-800' },
     { id: 'dava_dilekce', label: 'Taahhüdü İhlal Dava Dilekçesi', desc: 'İİK m.340 kapsamında ceza davası dilekçesi', icon: '⚖️', color: 'bg-red-50 border-red-200 text-red-800' },
-    { id: 'haciz_talebi', label: 'Haciz Talebi', desc: 'Borçlunun mal varlığına haciz konulması talebi', icon: '🏛️', color: 'bg-blue-50 border-blue-200 text-blue-800' },
+    { id: 'haciz_talebi', label: 'Haciz Talebi', desc: 'Borçlunun mal varlığına haciz konulması talebi', icon: '🏛️', color: 'bg-icra-light/10 border-icra-light/30 text-icra-dark' },
     { id: 'maas_haczi', label: 'Maaş Haczi Müzekkeresi', desc: 'Borçlunun maaşından kesinti yapılması', icon: '💰', color: 'bg-purple-50 border-purple-200 text-purple-800' },
     { id: 'mal_beyan', label: 'Mal Beyanında Bulunma Talebi', desc: 'Borçlunun mal varlığını beyan etmesi talebi', icon: '📋', color: 'bg-emerald-50 border-emerald-200 text-emerald-800' },
     { id: 'ozet_rapor', label: 'İhlal Özet Raporu', desc: 'Tüm ihlallerin detaylı özet raporu', icon: '📊', color: 'bg-slate-50 border-slate-200 text-slate-800' },
@@ -442,7 +442,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <Loader2 className="w-8 h-8 animate-spin text-icra-mid" />
           </div>
         ) : (<>
 
@@ -471,8 +471,8 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                     <p className="text-2xl font-bold text-slate-900 mt-1">{formatCurrencyShort(financeStats?.totalPortfolio || 0)}</p>
                     <p className="text-sm text-slate-500 mt-1">{financeStats?.totalCases || 0} dosya</p>
                   </div>
-                  <div className="p-3 bg-blue-100 rounded-xl">
-                    <DollarSign className="w-6 h-6 text-blue-600" />
+                  <div className="p-3 bg-icra-light/15 rounded-xl">
+                    <DollarSign className="w-6 h-6 text-icra-mid" />
                   </div>
                 </div>
               </div>
@@ -512,7 +512,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                   {[65, 45, 78, 52, 90, 68, 85, 72, 95, 80, 88, 92].map((height, i) => (
                     <div key={i} className="flex-1 flex flex-col items-center gap-2">
                       <div 
-                        className="w-full bg-gradient-to-t from-blue-600 to-indigo-500 rounded-t-lg transition-all hover:from-blue-500 hover:to-indigo-400"
+                        className="w-full bg-gradient-to-t from-icra-dark to-icra-mid rounded-t-lg transition-all hover:from-icra-mid hover:to-icra-light"
                         style={{ height: `${height}%` }}
                       />
                       <span className="text-xs text-slate-500">{['O', 'Ş', 'M', 'N', 'M', 'H', 'T', 'A', 'E', 'E', 'K', 'A'][i]}</span>
@@ -530,7 +530,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                       <div className="flex items-center gap-4">
                         <div className="text-right">
                           <p className="text-xs text-slate-500">Yasal</p>
-                          <p className="text-sm font-semibold text-blue-600">%{rate.legal}</p>
+                          <p className="text-sm font-semibold text-icra-mid">%{rate.legal}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-slate-500">Temerrüt</p>
@@ -550,8 +550,8 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Calculator className="w-5 h-5 text-blue-600" />
+                <div className="p-2 bg-icra-light/15 rounded-lg">
+                  <Calculator className="w-5 h-5 text-icra-mid" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">Faiz Hesaplama</h3>
               </div>
@@ -563,7 +563,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                     type="number"
                     value={calcPrincipal}
                     onChange={(e) => setCalcPrincipal(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                     placeholder="100,000"
                   />
                 </div>
@@ -574,7 +574,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                     type="number"
                     value={calcRate}
                     onChange={(e) => setCalcRate(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                     placeholder="24"
                   />
                 </div>
@@ -585,14 +585,14 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                     type="number"
                     value={calcDays}
                     onChange={(e) => setCalcDays(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                     placeholder="365"
                   />
                 </div>
                 
                 <button
                   onClick={calculateInterest}
-                  className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25"
+                  className="w-full py-3 bg-gradient-to-r from-icra-dark to-icra-mid text-white font-medium rounded-xl hover:from-icra-darkest hover:to-icra-dark transition-all shadow-lg shadow-icra-mid/25"
                 >
                   Hesapla
                 </button>
@@ -609,9 +609,9 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                     <p className="text-xl font-bold text-slate-900">{formatCurrency(parseFloat(calcPrincipal) || 0)}</p>
                   </div>
                   
-                  <div className="p-4 bg-blue-50 rounded-xl">
-                    <p className="text-sm text-blue-600">Hesaplanan Faiz</p>
-                    <p className="text-xl font-bold text-blue-700">{formatCurrency(calcResult)}</p>
+                  <div className="p-4 bg-icra-light/10 rounded-xl">
+                    <p className="text-sm text-icra-mid">Hesaplanan Faiz</p>
+                    <p className="text-xl font-bold text-icra-dark">{formatCurrency(calcResult)}</p>
                   </div>
                   
                   <div className="p-4 bg-emerald-50 rounded-xl">
@@ -646,7 +646,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
             <div className="p-6 border-b border-slate-100">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-slate-900">Son İşlemler</h3>
-                <button className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                <button className="text-sm text-icra-mid hover:text-icra-dark font-medium flex items-center gap-1">
                   Tümünü Gör <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -672,7 +672,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                         {tx.caseId && (
                           <>
                             <span className="text-slate-300">•</span>
-                            <span className="text-xs text-blue-600 font-medium">{tx.caseId}</span>
+                            <span className="text-xs text-icra-mid font-medium">{tx.caseId}</span>
                           </>
                         )}
                       </div>
@@ -697,8 +697,8 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <HandCoins className="w-5 h-5 text-blue-600" />
+                  <div className="p-2 bg-icra-light/15 rounded-lg">
+                    <HandCoins className="w-5 h-5 text-icra-mid" />
                   </div>
                   <div>
                     <p className="text-xs text-slate-500">Toplam Taahhüt</p>
@@ -751,7 +751,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                   </div>
                   <button
                     onClick={openNewCommitment}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center gap-2"
+                    className="px-4 py-2 bg-gradient-to-r from-icra-dark to-icra-mid text-white text-sm font-medium rounded-lg hover:from-icra-darkest hover:to-icra-dark transition-all flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4" /> Yeni Taahhüt
                   </button>
@@ -772,7 +772,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                   <tbody className="divide-y divide-slate-100">
                     {commitmentList.map((c) => (
                       <tr key={c.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-6 py-4 text-sm font-medium text-blue-600">{c.caseId}</td>
+                        <td className="px-6 py-4 text-sm font-medium text-icra-mid">{c.caseId}</td>
                         <td className="px-6 py-4 text-sm text-slate-900">{c.debtor}</td>
                         <td className="px-6 py-4 text-sm font-semibold text-slate-900">{formatCurrency(c.totalAmount)}</td>
                         <td className="px-6 py-4">
@@ -782,7 +782,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                                 className={clsx(
                                   'h-full rounded-full',
                                   c.status === 'completed' ? 'bg-emerald-500' : 
-                                  c.status === 'violated' ? 'bg-red-500' : 'bg-blue-500'
+                                  c.status === 'violated' ? 'bg-red-500' : 'bg-icra-mid'
                                 )}
                                 style={{ width: `${(c.paidCount / c.installmentCount) * 100}%` }}
                               />
@@ -1082,7 +1082,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                       totalAmount: selected ? selected.totalAmount.toString() : prev.totalAmount,
                     }));
                   }}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 >
                   <option value="">Dosya seçin...</option>
                   {cases.map(c => (
@@ -1099,7 +1099,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                   value={newForm.totalAmount}
                   onChange={(e) => setNewForm(prev => ({ ...prev, totalAmount: e.target.value }))}
                   placeholder="50000"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 />
               </div>
               <div>
@@ -1111,7 +1111,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                   placeholder="6"
                   min="1"
                   max="60"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 />
               </div>
               <div>
@@ -1120,12 +1120,12 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                   type="date"
                   value={newForm.startDate}
                   onChange={(e) => setNewForm(prev => ({ ...prev, startDate: e.target.value }))}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 />
               </div>
               {newForm.totalAmount && newForm.installmentCount && (
-                <div className="p-3 bg-blue-50 rounded-xl">
-                  <p className="text-sm text-blue-700">
+                <div className="p-3 bg-icra-light/10 rounded-xl">
+                  <p className="text-sm text-icra-dark">
                     Taksit tutarı: <strong>{formatCurrency(parseFloat(newForm.totalAmount) / parseInt(newForm.installmentCount))}</strong> x {newForm.installmentCount} taksit
                   </p>
                 </div>

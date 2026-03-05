@@ -66,7 +66,7 @@ interface PostItNote {
 
 const colorConfig: Record<string, { bg: string; text: string }> = {
   yellow: { bg: 'bg-yellow-200', text: 'text-yellow-900' },
-  blue: { bg: 'bg-blue-200', text: 'text-blue-900' },
+  blue: { bg: 'bg-sky-200', text: 'text-sky-900' },
   pink: { bg: 'bg-pink-200', text: 'text-pink-900' },
   green: { bg: 'bg-emerald-200', text: 'text-emerald-900' },
   purple: { bg: 'bg-purple-200', text: 'text-purple-900' },
@@ -81,7 +81,7 @@ const colorOptions = [
 ];
 
 const statusColors: Record<string, string> = {
-  active: 'bg-blue-100 text-blue-700',
+  active: 'bg-icra-light/15 text-icra-dark',
   pending: 'bg-amber-100 text-amber-700',
   completed: 'bg-emerald-100 text-emerald-700',
   warning: 'bg-red-100 text-red-700',
@@ -213,7 +213,7 @@ export default function Home() {
       <div className="flex-1 p-6 space-y-6">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+            <Loader2 className="w-8 h-8 text-icra-mid animate-spin" />
             <span className="ml-3 text-slate-500">Yükleniyor...</span>
           </div>
         ) : (
@@ -226,8 +226,8 @@ export default function Home() {
             change={`${s?.pendingCases || 0} beklemede`}
             changeType="neutral"
             icon={FolderKanban}
-            iconColor="text-blue-600"
-            iconBg="bg-blue-100"
+            iconColor="text-icra-mid"
+            iconBg="bg-icra-light/15"
           />
           <StatCard
             title="Aktif Takipler"
@@ -268,7 +268,7 @@ export default function Home() {
                   <FileText className="w-5 h-5 text-slate-600" />
                   <h2 className="text-lg font-semibold text-slate-900">Son Dosyalar</h2>
                 </div>
-                <a href="/cases" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                <a href="/cases" className="text-sm text-icra-mid hover:text-icra-dark font-medium">
                   Tümünü Gör
                 </a>
               </div>
@@ -319,7 +319,7 @@ export default function Home() {
                 >
                   <div className={`w-2 h-2 rounded-full mt-2 ${
                     note.type === 'warning' ? 'bg-red-500' : 
-                    note.type === 'reminder' ? 'bg-amber-500' : 'bg-blue-500'
+                    note.type === 'reminder' ? 'bg-amber-500' : 'bg-icra-mid'
                   }`} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-900 truncate">{note.content}</p>
@@ -375,35 +375,35 @@ export default function Home() {
 
           {/* Bottom Stats */}
           <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white">
+            <div className="bg-gradient-to-br from-icra-dark to-icra-darkest rounded-2xl p-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm">Toplam Tahsilat</p>
+                  <p className="text-icra-light/70 text-sm">Toplam Tahsilat</p>
                   <p className="text-3xl font-bold mt-2">{formatCurrencyShort(s?.totalIncome || 0)}</p>
-                  <p className="text-blue-200 text-sm mt-1">Gider: {formatCurrencyShort(s?.totalExpense || 0)}</p>
+                  <p className="text-icra-light/50 text-sm mt-1">Gider: {formatCurrencyShort(s?.totalExpense || 0)}</p>
                 </div>
-                <TrendingUp className="w-12 h-12 text-blue-300" />
+                <TrendingUp className="w-12 h-12 text-icra-light/40" />
               </div>
               <div className="mt-4 pt-4 border-t border-white/20 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-blue-200">Haciz Tahsilatı</span>
+                  <span className="text-icra-light/50">Haciz Tahsilatı</span>
                   <span className="font-semibold">₺312.450</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-blue-200">Taahhüt Tahsilatı</span>
+                  <span className="text-icra-light/50">Taahhüt Tahsilatı</span>
                   <span className="font-semibold">₺185.200</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-blue-200">Maaş Haczi Kesintisi</span>
+                  <span className="text-icra-light/50">Maaş Haczi Kesintisi</span>
                   <span className="font-semibold">₺98.750</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-blue-200">Banka Blokesi</span>
+                  <span className="text-icra-light/50">Banka Blokesi</span>
                   <span className="font-semibold">₺124.390</span>
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t border-white/20">
-                <div className="flex items-center gap-2 text-xs text-blue-200">
+                <div className="flex items-center gap-2 text-xs text-icra-light/50">
                   <Calendar className="w-3 h-3" />
                   <span>Son güncelleme: Bugün 09:45</span>
                 </div>
@@ -488,7 +488,7 @@ export default function Home() {
       {/* Floating Chat Button */}
       <button
         onClick={() => setShowChat(!showChat)}
-        className="fixed bottom-6 right-6 p-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all z-50"
+        className="fixed bottom-6 right-6 p-4 bg-gradient-to-r from-icra-dark to-icra-mid text-white rounded-full shadow-lg hover:shadow-xl transition-all z-50"
       >
         <MessageCircle className="w-6 h-6" />
       </button>
@@ -496,13 +496,13 @@ export default function Home() {
       {/* Chat Panel */}
       {showChat && (
         <div className="fixed bottom-24 right-6 w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
+          <div className="bg-gradient-to-r from-icra-darkest to-icra-dark p-4 text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <MessageCircle className="w-5 h-5" />
                 <div>
                   <h3 className="font-semibold">Kullanıcılar Arası Mesaj</h3>
-                  <p className="text-xs text-blue-100">Yüksel MARTI</p>
+                  <p className="text-xs text-icra-light/70">Yüksel MARTI</p>
                 </div>
               </div>
               <button onClick={() => setShowChat(false)} className="p-1 hover:bg-white/20 rounded">
@@ -516,11 +516,11 @@ export default function Home() {
               <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] rounded-2xl px-4 py-2 ${
                   msg.isOwn 
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-br-md' 
+                    ? 'bg-gradient-to-r from-icra-dark to-icra-mid text-white rounded-br-md' 
                     : 'bg-white text-slate-900 shadow-sm rounded-bl-md'
                 }`}>
                   <p className="text-sm">{msg.message}</p>
-                  <p className={`text-xs mt-1 ${msg.isOwn ? 'text-blue-100' : 'text-slate-400'}`}>{msg.time}</p>
+                  <p className={`text-xs mt-1 ${msg.isOwn ? 'text-icra-light/70' : 'text-slate-400'}`}>{msg.time}</p>
                 </div>
               </div>
             ))}
@@ -534,11 +534,11 @@ export default function Home() {
                 onChange={(e) => setChatMessage(e.target.value)}
                 placeholder="Mesajınızı yazın..."
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendChat(); } }}
-                className="flex-1 px-4 py-2 bg-slate-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-4 py-2 bg-slate-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
               />
               <button
                 onClick={handleSendChat}
-                className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full hover:shadow-lg transition-all"
+                className="p-2 bg-gradient-to-r from-icra-dark to-icra-mid text-white rounded-full hover:shadow-lg transition-all"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -567,7 +567,7 @@ export default function Home() {
                   value={newNoteForm.title}
                   onChange={(e) => setNewNoteForm(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Not başlığı"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 />
               </div>
               <div>
@@ -577,7 +577,7 @@ export default function Home() {
                   onChange={(e) => setNewNoteForm(prev => ({ ...prev, content: e.target.value }))}
                   placeholder="Not içeriği..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid resize-none"
                 />
               </div>
               <div>
@@ -587,7 +587,7 @@ export default function Home() {
                   value={newNoteForm.caseId}
                   onChange={(e) => setNewNoteForm(prev => ({ ...prev, caseId: e.target.value }))}
                   placeholder="Örn: GENEL - 1141"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
                 />
               </div>
               <div>

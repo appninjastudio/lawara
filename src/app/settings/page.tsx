@@ -116,7 +116,7 @@ export default function SettingsPage() {
                   className={clsx(
                     'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
                     activeTab === tab.id
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
+                      ? 'bg-gradient-to-r from-icra-dark to-icra-mid text-white shadow-lg shadow-icra-mid/25'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   )}
                 >
@@ -139,7 +139,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center gap-6 pb-6 border-b border-slate-100">
                   <div className="relative">
-                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-3xl font-bold text-white">
+                    <div className="w-24 h-24 bg-gradient-to-br from-icra-dark to-icra-mid rounded-2xl flex items-center justify-center text-3xl font-bold text-white">
                       TF
                     </div>
                     <button className="absolute -bottom-2 -right-2 p-2 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50 transition-colors">
@@ -149,7 +149,7 @@ export default function SettingsPage() {
                   <div>
                     <h3 className="text-lg font-semibold text-slate-900">Talip Furkan Doğan</h3>
                     <p className="text-sm text-slate-500">Administrator</p>
-                    <p className="text-sm text-blue-600 mt-1">talipfurkan@lawara.co</p>
+                    <p className="text-sm text-icra-mid mt-1">talipfurkan@lawara.co</p>
                   </div>
                 </div>
 
@@ -160,7 +160,7 @@ export default function SettingsPage() {
                       type="text"
                       value={profileForm.name}
                       onChange={e => setProfileForm(f => ({ ...f, name: e.target.value }))}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -171,7 +171,7 @@ export default function SettingsPage() {
                         type="email"
                         value={profileForm.email}
                         onChange={e => setProfileForm(f => ({ ...f, email: e.target.value }))}
-                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -183,7 +183,7 @@ export default function SettingsPage() {
                         type="tel"
                         value={profileForm.phone}
                         onChange={e => setProfileForm(f => ({ ...f, phone: e.target.value }))}
-                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -195,7 +195,7 @@ export default function SettingsPage() {
                         type="text"
                         value={profileForm.location}
                         onChange={e => setProfileForm(f => ({ ...f, location: e.target.value }))}
-                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -205,7 +205,7 @@ export default function SettingsPage() {
                   <button
                     onClick={() => handleSave('Profil bilgileri')}
                     disabled={saving}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50"
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-icra-dark to-icra-mid text-white font-medium rounded-xl hover:from-icra-darkest hover:to-icra-dark transition-all shadow-lg shadow-icra-mid/25 disabled:opacity-50"
                   >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     Değişiklikleri Kaydet
@@ -229,7 +229,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyForm.name}
                       onChange={e => setCompanyForm(f => ({ ...f, name: e.target.value }))}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -238,7 +238,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyForm.taxNo}
                       onChange={e => setCompanyForm(f => ({ ...f, taxNo: e.target.value }))}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -247,7 +247,7 @@ export default function SettingsPage() {
                       type="text"
                       value={companyForm.taxOffice}
                       onChange={e => setCompanyForm(f => ({ ...f, taxOffice: e.target.value }))}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                     />
                   </div>
                   <div className="md:col-span-2">
@@ -256,7 +256,7 @@ export default function SettingsPage() {
                       rows={3}
                       value={companyForm.address}
                       onChange={e => setCompanyForm(f => ({ ...f, address: e.target.value }))}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent resize-none"
                     />
                   </div>
                 </div>
@@ -265,7 +265,7 @@ export default function SettingsPage() {
                   <button
                     onClick={() => handleSave('Şirket bilgileri')}
                     disabled={saving}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50"
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-icra-dark to-icra-mid text-white font-medium rounded-xl hover:from-icra-darkest hover:to-icra-dark transition-all shadow-lg shadow-icra-mid/25 disabled:opacity-50"
                   >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     Değişiklikleri Kaydet
@@ -300,7 +300,7 @@ export default function SettingsPage() {
                             onClick={() => setNotifications({ ...notifications, [item.key]: !notifications[item.key as keyof typeof notifications] })}
                             className={clsx(
                               'w-12 h-6 rounded-full transition-colors relative',
-                              notifications[item.key as keyof typeof notifications] ? 'bg-blue-600' : 'bg-slate-300'
+                              notifications[item.key as keyof typeof notifications] ? 'bg-icra-mid' : 'bg-slate-300'
                             )}
                           >
                             <span className={clsx(
@@ -330,7 +330,7 @@ export default function SettingsPage() {
                             onClick={() => setNotifications({ ...notifications, [item.key]: !notifications[item.key as keyof typeof notifications] })}
                             className={clsx(
                               'w-12 h-6 rounded-full transition-colors relative',
-                              notifications[item.key as keyof typeof notifications] ? 'bg-blue-600' : 'bg-slate-300'
+                              notifications[item.key as keyof typeof notifications] ? 'bg-icra-mid' : 'bg-slate-300'
                             )}
                           >
                             <span className={clsx(
@@ -364,7 +364,7 @@ export default function SettingsPage() {
                           type="password"
                           value={passwordForm.current}
                           onChange={e => setPasswordForm(f => ({ ...f, current: e.target.value }))}
-                          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                         />
                       </div>
                       <div>
@@ -373,7 +373,7 @@ export default function SettingsPage() {
                           type="password"
                           value={passwordForm.newPass}
                           onChange={e => setPasswordForm(f => ({ ...f, newPass: e.target.value }))}
-                          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                         />
                       </div>
                       <div>
@@ -382,7 +382,7 @@ export default function SettingsPage() {
                           type="password"
                           value={passwordForm.confirm}
                           onChange={e => setPasswordForm(f => ({ ...f, confirm: e.target.value }))}
-                          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid focus:border-transparent"
                         />
                       </div>
                       <button
@@ -468,7 +468,7 @@ export default function SettingsPage() {
 
                   <div className="p-4 bg-slate-50 rounded-xl">
                     <h3 className="text-sm font-semibold text-slate-900 mb-4">Dil</h3>
-                    <select className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid">
                       <option>Türkçe</option>
                       <option>English</option>
                     </select>

@@ -66,8 +66,8 @@ export default function FoyDetailPage({ params }: { params: Promise<{ id: string
     })();
   }, [id]);
 
-  if (loading) return <div className="flex flex-col h-full"><Header title="İcra Föyü" subtitle="Yükleniyor..." /><div className="flex-1 flex items-center justify-center"><Loader2 className="w-8 h-8 text-blue-600 animate-spin" /></div></div>;
-  if (!foyu) return <div className="flex flex-col h-full"><Header title="İcra Föyü" subtitle="Bulunamadı" /><div className="flex-1 flex flex-col items-center justify-center text-slate-400"><FileText className="w-16 h-16 mb-4" /><p>Föy bulunamadı</p><a href="/cases" className="mt-4 text-blue-600 hover:underline">Dosya listesine dön</a></div></div>;
+  if (loading) return <div className="flex flex-col h-full"><Header title="İcra Föyü" subtitle="Yükleniyor..." /><div className="flex-1 flex items-center justify-center"><Loader2 className="w-8 h-8 text-icra-mid animate-spin" /></div></div>;
+  if (!foyu) return <div className="flex flex-col h-full"><Header title="İcra Föyü" subtitle="Bulunamadı" /><div className="flex-1 flex flex-col items-center justify-center text-slate-400"><FileText className="w-16 h-16 mb-4" /><p>Föy bulunamadı</p><a href="/cases" className="mt-4 text-icra-mid hover:underline">Dosya listesine dön</a></div></div>;
 
   const { dosya, taraflar, alacakKalemleri, tahsilatlar, islemGecmisi, tebligatlar, hacizler, malvarligiArastirmalari, operasyonelTakip, gorusmeler, ziyaretler, belgeler } = foyu;
   const borclu = taraflar.find(t => t.tarafRolu === 'borclu');
@@ -79,10 +79,10 @@ export default function FoyDetailPage({ params }: { params: Promise<{ id: string
       <div className="flex-1 overflow-auto">
 
         {/* KPI Bar */}
-        <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-6 py-4">
+        <div className="bg-gradient-to-r from-icra-darkest to-icra-dark text-white px-6 py-4">
           <div className="flex items-center justify-between mb-3">
             <a href={`/cases/${id}`} className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white"><ArrowLeft className="w-4 h-4" /> Dosya Detayına Dön</a>
-            <a href={`/cases/${id}/foy/edit`} className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors">
+            <a href={`/cases/${id}/foy/edit`} className="px-4 py-1.5 bg-icra-mid hover:bg-icra-light text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors">
               <Edit2 className="w-3.5 h-3.5" /> Föyü Düzenle
             </a>
           </div>
@@ -91,8 +91,8 @@ export default function FoyDetailPage({ params }: { params: Promise<{ id: string
               { l: 'Toplam Alacak', v: fc(hesaplanan?.toplamAlacak || 0), c: 'text-white' },
               { l: 'Tahsilat', v: fc(hesaplanan?.toplamTahsilat || 0), c: 'text-emerald-400' },
               { l: 'Kalan Borç', v: fc(hesaplanan?.kalanBorc || 0), c: 'text-orange-400' },
-              { l: 'Tahsil %', v: `%${hesaplanan?.tahsilYuzdesi?.toFixed(1) || '0'}`, c: 'text-cyan-400' },
-              { l: 'Durum', v: statusOpt?.label || dosya.dosyaStatusu, c: 'text-blue-300' },
+              { l: 'Tahsil %', v: `%${hesaplanan?.tahsilYuzdesi?.toFixed(1) || '0'}`, c: 'text-icra-light' },
+              { l: 'Durum', v: statusOpt?.label || dosya.dosyaStatusu, c: 'text-icra-light' },
               { l: 'Risk', v: `${operasyonelTakip.riskSkoru}/5`, c: 'text-yellow-400' },
             ].map((k, i) => (
               <div key={i} className="bg-white/10 rounded-xl p-3"><p className="text-[10px] uppercase tracking-wider text-slate-400">{k.l}</p><p className={clsx('text-lg font-bold', k.c)}>{k.v}</p></div>
@@ -104,7 +104,7 @@ export default function FoyDetailPage({ params }: { params: Promise<{ id: string
         <div className="border-b border-slate-200 bg-white sticky top-0 z-10">
           <div className="flex overflow-x-auto px-4">
             {TABS.map(tab => (
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={clsx('flex items-center gap-1.5 px-4 py-3 text-xs font-medium border-b-2 whitespace-nowrap cursor-pointer', activeTab === tab.key ? 'border-blue-600 text-blue-700 bg-blue-50/50' : 'border-transparent text-slate-500 hover:text-slate-700')}>{tab.icon} {tab.label}</button>
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={clsx('flex items-center gap-1.5 px-4 py-3 text-xs font-medium border-b-2 whitespace-nowrap cursor-pointer', activeTab === tab.key ? 'border-icra-mid text-icra-dark bg-icra-light/10' : 'border-transparent text-slate-500 hover:text-slate-700')}>{tab.icon} {tab.label}</button>
             ))}
           </div>
         </div>
@@ -114,7 +114,7 @@ export default function FoyDetailPage({ params }: { params: Promise<{ id: string
           {/* DOSYA BİLGİLERİ */}
           {activeTab === 'dosya' && (
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-6">
-              <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2"><FileText className="w-5 h-5 text-blue-600" /> Dosya Bilgileri</h3>
+              <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2"><FileText className="w-5 h-5 text-icra-mid" /> Dosya Bilgileri</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <InfoBox label="Föy No" value={dosya.foyNo} />
                 <InfoBox label="İcra Dairesi" value={dosya.icraDairesi} />
@@ -170,7 +170,7 @@ export default function FoyDetailPage({ params }: { params: Promise<{ id: string
           {/* ALACAK KALEMLERİ */}
           {activeTab === 'alacak' && hesaplanan && (
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-              <h3 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2"><Banknote className="w-5 h-5 text-blue-600" /> Alacak Kalemleri</h3>
+              <h3 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2"><Banknote className="w-5 h-5 text-icra-mid" /> Alacak Kalemleri</h3>
               <div className="space-y-2">
                 {[
                   ['Ana Para', alacakKalemleri.anaPara], ['İşlemiş Faiz', alacakKalemleri.islemiFaiz],
@@ -329,9 +329,9 @@ export default function FoyDetailPage({ params }: { params: Promise<{ id: string
               </div>
               <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="flex-1 min-w-[200px] relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" value={belgeArama} onChange={e => setBelgeArama(e.target.value)} placeholder="Belge ara (ad, açıklama, etiket)..." className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
-                  <select value={belgeKategoriFiltre} onChange={e => setBelgeKategoriFiltre(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="all">Tüm Kategoriler</option>{BELGE_KATEGORISI_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
-                  <select value={belgeKaynakFiltre} onChange={e => setBelgeKaynakFiltre(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="all">Tüm Kaynaklar</option>{BELGE_KAYNAGI_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
+                  <div className="flex-1 min-w-[200px] relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" /><input type="text" value={belgeArama} onChange={e => setBelgeArama(e.target.value)} placeholder="Belge ara (ad, açıklama, etiket)..." className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid" /></div>
+                  <select value={belgeKategoriFiltre} onChange={e => setBelgeKategoriFiltre(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-icra-mid"><option value="all">Tüm Kategoriler</option>{BELGE_KATEGORISI_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
+                  <select value={belgeKaynakFiltre} onChange={e => setBelgeKaynakFiltre(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-icra-mid"><option value="all">Tüm Kaynaklar</option>{BELGE_KAYNAGI_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
                   <button onClick={() => setBelgeSadecaOnemli(!belgeSadecaOnemli)} className={clsx('px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1.5 border cursor-pointer', belgeSadecaOnemli ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50')}><Star className={clsx('w-3.5 h-3.5', belgeSadecaOnemli && 'fill-amber-400')} /> Önemli</button>
                 </div>
               </div>
@@ -352,18 +352,18 @@ export default function FoyDetailPage({ params }: { params: Promise<{ id: string
                               <div className="flex items-center gap-2"><h4 className="text-sm font-semibold text-slate-900 truncate">{b.belgeAdi}</h4>{b.onemliMi && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400 flex-shrink-0" />}</div>
                               <p className="text-xs text-slate-500 mt-0.5 truncate">{b.dosyaAdi}</p>
                             </div>
-                            <button className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 cursor-pointer flex-shrink-0" title="İndir"><Download className="w-4 h-4" /></button>
+                            <button className="p-1.5 rounded-lg text-icra-mid hover:bg-icra-light/10 cursor-pointer flex-shrink-0" title="İndir"><Download className="w-4 h-4" /></button>
                           </div>
                           <div className="flex flex-wrap items-center gap-2 mt-2">
                             <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">{katOpt?.label || b.belgeKategorisi}</span>
-                            <span className={clsx('px-2 py-0.5 rounded text-[10px] font-medium', b.belgeKaynagi === 'uyap' ? 'bg-indigo-100 text-indigo-700' : b.belgeKaynagi === 'tarama' ? 'bg-cyan-100 text-cyan-700' : 'bg-slate-100 text-slate-600')}>{kaynakOpt?.label || b.belgeKaynagi}</span>
+                            <span className={clsx('px-2 py-0.5 rounded text-[10px] font-medium', b.belgeKaynagi === 'uyap' ? 'bg-icra-light/15 text-icra-dark' : b.belgeKaynagi === 'tarama' ? 'bg-cyan-100 text-cyan-700' : 'bg-slate-100 text-slate-600')}>{kaynakOpt?.label || b.belgeKaynagi}</span>
                             <span className="text-[10px] text-slate-400">{fsize(b.dosyaBoyutu)}</span>
                             <span className="text-[10px] text-slate-400">•</span>
                             <span className="text-[10px] text-slate-400">{fd(b.createdAt)}</span>
-                            {b.uyapEvrakId && <><span className="text-[10px] text-slate-400">•</span><span className="text-[10px] text-indigo-500 font-mono">{b.uyapEvrakId}</span></>}
+                            {b.uyapEvrakId && <><span className="text-[10px] text-slate-400">•</span><span className="text-[10px] text-icra-mid font-mono">{b.uyapEvrakId}</span></>}
                           </div>
                           {b.aciklama && <p className="text-xs text-slate-600 mt-1.5 line-clamp-2">{b.aciklama}</p>}
-                          {b.etiketler.length > 0 && <div className="flex flex-wrap gap-1 mt-1.5">{b.etiketler.map((e, i) => <span key={i} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px]">#{e}</span>)}</div>}
+                          {b.etiketler.length > 0 && <div className="flex flex-wrap gap-1 mt-1.5">{b.etiketler.map((e, i) => <span key={i} className="px-1.5 py-0.5 bg-blue-50 text-icra-mid rounded text-[10px]">#{e}</span>)}</div>}
                         </div>
                       </div>
                     </div>
@@ -379,18 +379,18 @@ export default function FoyDetailPage({ params }: { params: Promise<{ id: string
           {activeTab === 'operasyonel' && (
             <div className="space-y-5">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                <h3 className="text-base font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-indigo-600" /> Operasyonel Takip</h3>
+                <h3 className="text-base font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-icra-mid" /> Operasyonel Takip</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <InfoBox label="Sorumlu" value={operasyonelTakip.sorumluPersonel} />
                   <InfoBox label="Son İşlem" value={fd(operasyonelTakip.sonIslemTarihi)} />
-                  <div className="p-3 bg-slate-50 rounded-xl"><p className="text-[10px] text-slate-500 uppercase">Sonraki İşlem</p><p className="text-sm font-semibold text-blue-600">{fd(operasyonelTakip.sonrakiIslemTarihi)}</p></div>
+                  <div className="p-3 bg-slate-50 rounded-xl"><p className="text-[10px] text-slate-500 uppercase">Sonraki İşlem</p><p className="text-sm font-semibold text-icra-mid">{fd(operasyonelTakip.sonrakiIslemTarihi)}</p></div>
                   <div className="p-3 bg-amber-50 rounded-xl"><p className="text-[10px] text-amber-600 uppercase">Hatırlatma</p><p className="text-sm font-semibold text-amber-700">{fd(operasyonelTakip.hatirlatmaTarihi)}</p></div>
                   <div className="p-3 bg-slate-50 rounded-xl"><p className="text-[10px] text-slate-500 uppercase">Risk</p><div className="flex gap-1 mt-1">{[1,2,3,4,5].map(i => <div key={i} className={clsx('w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center', i <= operasyonelTakip.riskSkoru ? (operasyonelTakip.riskSkoru <= 2 ? 'bg-emerald-500 text-white' : operasyonelTakip.riskSkoru <= 3 ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white') : 'bg-slate-200')}>{i}</div>)}</div></div>
                   <InfoBox label="Tahsil Olasılığı" value={TAHSIL_OLASILIGI_OPTIONS.find(o => o.value === operasyonelTakip.tahsilOlasiligi)?.label} />
                   <div className="p-3 bg-slate-50 rounded-xl"><p className="text-[10px] text-slate-500 uppercase">Öncelik</p><p className={clsx('text-sm font-semibold', operasyonelTakip.oncelik === 'acil' ? 'text-red-600' : operasyonelTakip.oncelik === 'yuksek' ? 'text-orange-600' : 'text-slate-700')}>{operasyonelTakip.oncelik.charAt(0).toUpperCase() + operasyonelTakip.oncelik.slice(1)}</p></div>
                 </div>
                 {operasyonelTakip.icNotlar && <div className="mt-4 p-4 bg-yellow-50 border border-yellow-100 rounded-xl"><p className="text-xs font-semibold text-yellow-800 mb-1">İç Notlar</p><p className="text-sm text-yellow-900">{operasyonelTakip.icNotlar}</p></div>}
-                {operasyonelTakip.sonDurumOzeti && <div className="mt-3 p-4 bg-blue-50 border border-blue-100 rounded-xl"><p className="text-xs font-semibold text-blue-800 mb-1">Son Durum Özeti</p><p className="text-sm text-blue-900">{operasyonelTakip.sonDurumOzeti}</p></div>}
+                {operasyonelTakip.sonDurumOzeti && <div className="mt-3 p-4 bg-icra-light/10 border border-icra-light/20 rounded-xl"><p className="text-xs font-semibold text-icra-dark mb-1">Son Durum Özeti</p><p className="text-sm text-icra-darkest">{operasyonelTakip.sonDurumOzeti}</p></div>}
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 <div className="bg-white rounded-2xl shadow-sm border p-5">
