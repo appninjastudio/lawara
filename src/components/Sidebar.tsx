@@ -21,38 +21,32 @@ const navItems = [
   {
     name: 'Dashboard',
     href: '/',
-    icon: LayoutDashboard,
-    description: 'Overview'
+    icon: LayoutDashboard
   },
   {
     name: 'Dosya Takibi',
     href: '/cases',
-    icon: FolderKanban,
-    description: 'Case Management'
+    icon: FolderKanban
   },
   {
     name: 'Finans',
     href: '/finance',
-    icon: Calculator,
-    description: 'Finance & Interest'
+    icon: Calculator
   },
   {
     name: 'Entegrasyon',
     href: '/integrations',
-    icon: Link2,
-    description: 'UYAP & SMS'
+    icon: Link2
   },
   {
     name: 'İcra Caller',
     href: '/caller',
-    icon: PhoneCall,
-    description: 'PBX & Arama'
+    icon: PhoneCall
   },
   {
     name: 'Ayarlar',
     href: '/settings',
-    icon: Settings,
-    description: 'Settings'
+    icon: Settings
   }
 ];
 
@@ -130,15 +124,7 @@ export default function Sidebar() {
                 >
                   <item.icon className={clsx('w-5 h-5 flex-shrink-0', isActive && 'text-white')} />
                   {!collapsed && (
-                    <div className="flex flex-col">
-                      <span className="font-medium text-sm">{item.name}</span>
-                      <span className={clsx(
-                        'text-xs',
-                        isActive ? 'text-icra-light/70' : 'text-slate-500'
-                      )}>
-                        {item.description}
-                      </span>
-                    </div>
+                    <span className="font-medium text-sm">{item.name}</span>
                   )}
                 </Link>
               </li>
