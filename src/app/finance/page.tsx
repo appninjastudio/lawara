@@ -96,6 +96,140 @@ export default function FinancePage() {
   const [draftGenerating, setDraftGenerating] = useState(false);
   const [draftContent, setDraftContent] = useState<string>('');
   const [draftReady, setDraftReady] = useState(false);
+  const [showTutanakModal, setShowTutanakModal] = useState(false);
+  const [tutanakTarget, setTutanakTarget] = useState<CommitmentItem | null>(null);
+  const [tutanakType, setTutanakType] = useState<string>('');
+  const [tutanakContent, setTutanakContent] = useState<string>('');
+  const [tutanakReady, setTutanakReady] = useState(false);
+  const [tutanakGenerating, setTutanakGenerating] = useState(false);
+
+  const takipTurleri = [
+    { id: 'ilamsiz', label: 'İlamsız İcra', desc: 'Genel haciz yolu ile ilamsız takip (İİK m.42-72)', icon: '📄', color: 'bg-blue-50 border-blue-200 text-blue-800' },
+    { id: 'ilamli', label: 'İlamlı İcra', desc: 'İlam veya ilam niteliğinde belge ile takip (İİK m.24-41)', icon: '⚖️', color: 'bg-purple-50 border-purple-200 text-purple-800' },
+    { id: 'kambiyo', label: 'Kambiyo Senetleri', desc: 'Çek, senet, poliçeye dayalı takip (İİK m.167-176)', icon: '🏦', color: 'bg-emerald-50 border-emerald-200 text-emerald-800' },
+    { id: 'kira', label: 'Kira Alacağı', desc: 'Kira bedelinin ödenmemesi nedeniyle takip (İİK m.269-276)', icon: '🏠', color: 'bg-amber-50 border-amber-200 text-amber-800' },
+    { id: 'rehin', label: 'Rehnin Paraya Çevrilmesi', desc: 'İpotekli veya rehinli alacak takibi (İİK m.145-153)', icon: '🔑', color: 'bg-red-50 border-red-200 text-red-800' },
+    { id: 'nafaka', label: 'Nafaka Alacağı', desc: 'Nafaka ilamına dayalı icra takibi', icon: '👨‍👩‍👧', color: 'bg-pink-50 border-pink-200 text-pink-800' },
+  ];
+
+  const generateTutanak = (type: string, commitment: CommitmentItem) => {
+    const today = new Date().toLocaleDateString('tr-TR');
+    const taksitTutar = commitment.totalAmount / commitment.installmentCount;
+    const takipLabel = takipTurleri.find(t => t.id === type)?.label || type;
+
+    const maddeMap: Record<string, string> = {
+      ilamsiz: 'İİK m.111',
+      ilamli: 'İİK m.32 ve İİK m.111',
+      kambiyo: 'İİK m.171 ve İİK m.111',
+      kira: 'İİK m.269 ve İİK m.111',
+      rehin: 'İİK m.150/a ve İİK m.111',
+      nafaka: 'İİK m.38 ve İİK m.111',
+    };
+
+    const aciklamaMap: Record<string, string> = {
+      ilamsiz: `Alacaklı tarafından borçlu aleyhine genel haciz yolu ile başlatılan ilamsız icra takibinde, ödeme emri borçluya tebliğ edilmiş olup, borçlu yasal süre içerisinde itirazda bulunmamıştır.`,
+      ilamli: `Alacaklı tarafından borçlu aleyhine mahkeme ilamına dayalı olarak başlatılan ilamlı icra takibinde, icra emri borçluya tebliğ edilmiş olup, borçlu yasal süre içerisinde borcunu ödememiştir.`,
+      kambiyo: `Alacaklı tarafından borçlu aleyhine kambiyo senetlerine (çek/senet/poliçe) mahsus haciz yolu ile başlatılan icra takibinde, ödeme emri borçluya tebliğ edilmiş olup, borçlu yasal süre içerisinde itirazda bulunmamıştır.`,
+      kira: `Alacaklı tarafından borçlu (kiracı) aleyhine kira alacağının tahsili amacıyla başlatılan icra takibinde, ödeme emri borçluya tebliğ edilmiş olup, borçlu yasal süre içerisinde borcunu ödememiştir.`,
+      rehin: `Alacaklı tarafından borçlu aleyhine rehin/ipotek hakkına dayalı olarak başlatılan icra takibinde, icra emri borçluya tebliğ edilmiştir.`,
+      nafaka: `Alacaklı tarafından borçlu aleyhine nafaka ilamına dayalı olarak başlatılan icra takibinde, icra emri borçluya tebliğ edilmiş olup, borçlu nafaka borcunu ödememiştir.`,
+    };
+
+    return `İCRA TAAHHÜT TUTANAĞI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Takip Türü : ${takipLabel}
+Yasal Dayanak: ${maddeMap[type] || 'İİK m.111'}
+Tarih       : ${today}
+Dosya No    : ${commitment.caseId}
+
+ALACAKLI BİLGİLERİ:
+Alacaklı     : Lawara Hukuk Bürosu
+Vekili       : Av. Talip Furkan Doğan
+
+BORÇLU BİLGİLERİ:
+Borçlu       : ${commitment.debtor}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TAKİP AÇIKLAMASI:
+${aciklamaMap[type] || aciklamaMap.ilamsiz}
+
+BORÇ MİKTARI:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Toplam Borç Miktarı      : ${formatCurrency(commitment.totalAmount)}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TAAHHÜT ŞARTLARI:
+
+Borçlu ${commitment.debtor}, yukarıda belirtilen ${formatCurrency(commitment.totalAmount)} tutarındaki borcun tamamını aşağıda belirtilen taksit planı çerçevesinde ödemeyi kabul ve taahhüt eder.
+
+ÖDEME PLANI:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Taksit Sayısı    : ${commitment.installmentCount} taksit
+Taksit Tutarı    : ${formatCurrency(taksitTutar)}
+Ödeme Periyodu   : Aylık
+İlk Ödeme Tarihi : Taahhüt tarihinden itibaren 30 gün
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${Array.from({ length: commitment.installmentCount }, (_, i) => {
+  const tarih = new Date();
+  tarih.setMonth(tarih.getMonth() + i + 1);
+  return `${(i + 1).toString().padStart(2, ' ')}. Taksit : ${formatCurrency(taksitTutar)}  -  Son Ödeme: ${tarih.toLocaleDateString('tr-TR')}`;
+}).join('\n')}
+
+TAAHHÜDÜN İHLALİ HALİNDE:
+
+Borçlunun taksitlerden herhangi birini zamanında ve tam olarak ödememesi halinde taahhüt ihlal edilmiş sayılacak olup;
+
+1. Alacaklı, kalan borcun tamamını muaccel hale getirerek tahsilini talep edebilir.
+2. İİK m.340 gereğince borçlu hakkında "Taahhüdü İhlal" suçundan şikayette bulunulabilir.
+3. Borçlunun menkul ve gayrimenkul malları ile banka hesaplarına haciz konulabilir.
+4. Borçlu 3 (üç) aya kadar tazyik hapsi ile cezalandırılabilir.
+
+İHTAR: Bu taahhüdün ihlali halinde İİK m.340 hükümleri uygulanacaktır.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+İşbu tutanak, tarafların huzurunda tanzim edilmiştir.
+
+BORÇLU                           ALACAKLI VEKİLİ
+${commitment.debtor}              Av. Talip Furkan Doğan
+İmza: _______________            İmza: _______________
+
+İCRA MÜDÜRÜ
+İmza: _______________
+Mühür
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Bu tutanak ${takipLabel} kapsamında ${maddeMap[type] || 'İİK m.111'} 
+hükümleri çerçevesinde düzenlenmiştir.
+Düzenlenme Tarihi: ${today}`;
+  };
+
+  const handleGenerateTutanak = async (type: string) => {
+    if (!tutanakTarget) return;
+    setTutanakType(type);
+    setTutanakGenerating(true);
+    setTutanakReady(false);
+    setTutanakContent('');
+    await new Promise(r => setTimeout(r, 1200));
+    const content = generateTutanak(type, tutanakTarget);
+    setTutanakContent(content);
+    setTutanakGenerating(false);
+    setTutanakReady(true);
+  };
+
+  const handleDownloadTutanak = (format: 'pdf' | 'word' | 'udf') => {
+    if (!tutanakContent || !tutanakTarget) return;
+    const fileName = `Icra_Taahut_Tutanagi_${tutanakTarget.caseId.replace('/', '-')}_${new Date().toISOString().slice(0, 10)}`;
+    const mimeTypes = { pdf: 'application/pdf', word: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', udf: 'application/octet-stream' };
+    const extensions = { pdf: '.pdf', word: '.docx', udf: '.udf' };
+    const blob = new Blob([tutanakContent], { type: mimeTypes[format] });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileName}${extensions[format]}`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const reportTypes = [
     { id: 'ihtarname', label: 'İhtarname', desc: 'Borçluya ödeme yapması için resmi uyarı', icon: '📄', color: 'bg-amber-50 border-amber-200 text-amber-800' },
@@ -770,6 +904,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                       <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Taksit</th>
                       <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Durum</th>
                       <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Sonraki Ödeme</th>
+                      <th className="px-6 py-3 text-right text-xs font-semibold text-slate-600 uppercase">İşlemler</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -814,6 +949,17 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                           ) : (
                             <span className="text-sm text-slate-400">-</span>
                           )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-end">
+                            <button
+                              onClick={() => { setTutanakTarget(c); setShowTutanakModal(true); setTutanakType(''); setTutanakContent(''); setTutanakReady(false); }}
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-icra-dark to-icra-mid text-white text-xs font-medium rounded-lg hover:from-icra-darkest hover:to-icra-dark transition-all shadow-sm"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              Tutanak Hazırla
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1062,6 +1208,141 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
             <div className="p-4 border-t border-slate-100 flex justify-end">
               <button
                 onClick={() => { setShowDraftModal(false); setDraftTarget(null); }}
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* İcra Taahhüt Tutanağı Modal */}
+      {showTutanakModal && tutanakTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-icra-light/10 to-icra-mid/10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">İcra Taahhüt Tutanağı Hazırla</h3>
+                  <p className="text-sm text-slate-500 mt-0.5">
+                    {tutanakTarget.caseId} - {tutanakTarget.debtor} | Tutar: {formatCurrency(tutanakTarget.totalAmount)}
+                  </p>
+                </div>
+                <button onClick={() => { setShowTutanakModal(false); setTutanakTarget(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg">
+                  <X className="w-5 h-5 text-slate-400" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              {/* Step 1: Takip Türü Seçimi */}
+              {!tutanakReady && !tutanakGenerating && (
+                <div className="p-6">
+                  <h4 className="text-sm font-semibold text-slate-700 mb-4">Takip türünü seçin:</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {takipTurleri.map((tt) => (
+                      <button
+                        key={tt.id}
+                        onClick={() => handleGenerateTutanak(tt.id)}
+                        className={clsx(
+                          'flex items-start gap-3 p-4 border rounded-xl text-left transition-all hover:shadow-md hover:scale-[1.01]',
+                          tt.color
+                        )}
+                      >
+                        <span className="text-2xl mt-0.5">{tt.icon}</span>
+                        <div>
+                          <p className="text-sm font-semibold">{tt.label}</p>
+                          <p className="text-xs mt-0.5 opacity-75">{tt.desc}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Generating */}
+              {tutanakGenerating && (
+                <div className="p-12 flex flex-col items-center justify-center">
+                  <div className="relative">
+                    <div className="w-16 h-16 border-4 border-icra-light/30 rounded-full animate-spin border-t-icra-mid" />
+                    <FileText className="w-6 h-6 text-icra-mid absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-700 mt-4">Taahhüt tutanağı hazırlanıyor...</p>
+                  <p className="text-xs text-slate-400 mt-1">{takipTurleri.find(t => t.id === tutanakType)?.label}</p>
+                </div>
+              )}
+
+              {/* Step 3: Tutanak Ready */}
+              {tutanakReady && tutanakContent && (
+                <div className="p-6 space-y-4">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                      <span className="text-sm font-semibold text-emerald-700">Tutanak hazır!</span>
+                      <span className="px-2 py-0.5 bg-icra-light/15 text-icra-dark rounded-full text-xs font-medium">
+                        {takipTurleri.find(t => t.id === tutanakType)?.label}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => { if (tutanakContent) { navigator.clipboard.writeText(tutanakContent); } }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        Kopyala
+                      </button>
+                      <button
+                        onClick={() => handleDownloadTutanak('pdf')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        PDF
+                      </button>
+                      <button
+                        onClick={() => handleDownloadTutanak('word')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        Word
+                      </button>
+                      <button
+                        onClick={() => handleDownloadTutanak('udf')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        UDF
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 font-mono text-sm text-slate-800 whitespace-pre-wrap leading-relaxed max-h-[45vh] overflow-y-auto">
+                    {tutanakContent}
+                  </div>
+
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      onClick={() => { setTutanakType(''); setTutanakContent(''); setTutanakReady(false); }}
+                      className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                    >
+                      <ArrowRight className="w-4 h-4 rotate-180" />
+                      Farklı Tür Seç
+                    </button>
+                    <button
+                      onClick={() => handleGenerateTutanak(tutanakType)}
+                      className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-icra-dark bg-icra-light/15 hover:bg-icra-light/25 rounded-xl transition-colors"
+                    >
+                      <Loader2 className="w-4 h-4" />
+                      Yeniden Oluştur
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-slate-100 flex justify-end">
+              <button
+                onClick={() => { setShowTutanakModal(false); setTutanakTarget(null); }}
                 className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
               >
                 Kapat
