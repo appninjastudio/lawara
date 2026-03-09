@@ -222,6 +222,47 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
   const totalIncome = caseData.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const totalExpense = caseData.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
 
+  // ── Detaylı Gelir-Gider Hesaplama ──
+  const anaPara = caseData.principalAmount;
+  const isleyenFaiz = caseData.interestAmount;
+  const takipOncesiMasraf = anaPara * 0.012; // %1.2 takip öncesi masraf
+  const vekaletUcreti = anaPara * 0.15; // %15 avukatlık vekalet ücreti
+  const basvuruHarci = 427.60; // 2024 sabit
+  const vekalet_BasvuruHarci = 427.60;
+  const pesinHarc = anaPara * 0.005; // binde 5 peşin harç
+  const tebligatGideri = (caseData.tebligats?.length || 1) * 187.00; // tebligat başına
+  const pttMasrafi = (caseData.tebligats?.length || 1) * 95.00;
+  const bilirkisiUcreti = caseData.lawsuits?.length ? 8500 : 0;
+  const kesfUcreti = caseData.seizures?.filter(s => s.type === 'property').length ? 12000 : 0;
+  const ilanGideri = 0;
+  const diger_masraflar = 350;
+
+  const toplamTakipMasrafi = takipOncesiMasraf + basvuruHarci + vekalet_BasvuruHarci + pesinHarc + tebligatGideri + pttMasrafi + diger_masraflar;
+  const toplamYargilamaMasrafi = bilirkisiUcreti + kesfUcreti + ilanGideri;
+
+  const toplamAlacak = anaPara + isleyenFaiz + vekaletUcreti + toplamTakipMasrafi + toplamYargilamaMasrafi;
+
+  const tahsilHarciOrani = 0.0455; // %4.55 tahsil harcı
+  const tahsilHarci = totalIncome * tahsilHarciOrani;
+  const cezaeviYapiHarci = totalIncome * 0.02; // %2
+  const baroPayi = vekaletUcreti * 0.05; // %5 baro payı
+  const kdvOrani = 0.20;
+  const vekaletKDV = vekaletUcreti * kdvOrani;
+
+  const toplamKesintiler = tahsilHarci + cezaeviYapiHarci + baroPayi + vekaletKDV;
+
+  const tahsilEdilen = totalIncome;
+  const kalanAnaPara = Math.max(0, anaPara - (tahsilEdilen * (anaPara / toplamAlacak)));
+  const kalanFaiz = Math.max(0, isleyenFaiz - (tahsilEdilen * (isleyenFaiz / toplamAlacak)));
+  const kalanToplam = Math.max(0, toplamAlacak - tahsilEdilen);
+
+  // Faiz hesaplama günlük
+  const bugun = new Date();
+  const acilisTarihi = new Date(caseData.openDate);
+  const gecenGun = Math.floor((bugun.getTime() - acilisTarihi.getTime()) / (1000 * 60 * 60 * 24));
+  const yillikFaizOrani = 0.24; // %24 yasal faiz oranı
+  const gunlukFaiz = (anaPara * yillikFaizOrani) / 365;
+
   const tabs = [
     { key: 'overview' as const, label: 'Genel Bakış', icon: FileText },
     { key: 'seizures' as const, label: `Hacizler (${caseData.seizures?.length || 0})`, icon: Shield },
@@ -311,6 +352,209 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
             ))}
           </div>
         </div>
+
+        {/* ══ 2-Column Layout: Left Financial Panel + Right Tab Content ══ */}
+        <div className="flex gap-6">
+
+        {/* ══════════ SOL PANEL: Detaylı Gelir-Gider Tablosu ══════════ */}
+        <div className="w-80 flex-shrink-0 space-y-3">
+          {/* Hesap Tarihi */}
+          <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Hesap Tarihi</span>
+              <span className="text-xs text-slate-400">{gecenGun} gün</span>
+            </div>
+            <p className="text-sm font-bold text-slate-900">{bugun.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+          </div>
+
+          {/* ── Takip Çıkışı ── */}
+          <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="px-4 py-3 bg-gradient-to-r from-icra-dark to-icra-mid">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-white">Takip Çıkışı</span>
+                <span className="text-sm font-bold text-white">{formatCurrency(anaPara + isleyenFaiz + toplamTakipMasrafi)}</span>
+              </div>
+            </div>
+            <div className="divide-y divide-slate-50">
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs font-semibold text-slate-700">Ana Para</span>
+                <span className="text-xs font-bold text-slate-900">{formatCurrency(anaPara)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                <span className="text-xs text-slate-600">İşleyen Faiz (%{(yillikFaizOrani * 100).toFixed(0)})</span>
+                <span className="text-xs font-semibold text-amber-600">{formatCurrency(isleyenFaiz)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">Günlük Faiz</span>
+                <span className="text-xs font-medium text-slate-500">{formatCurrency(gunlukFaiz)}/gün</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                <span className="text-xs text-slate-600">Takip Ön. Masraf</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(takipOncesiMasraf)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">Başvuru Harcı</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(basvuruHarci)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                <span className="text-xs text-slate-600">Vek. Başvuru Harcı</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(vekalet_BasvuruHarci)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">Peşin Harç (‰5)</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(pesinHarc)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                <span className="text-xs text-slate-600">Tebligat Gideri ({caseData.tebligats?.length || 1} adet)</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(tebligatGideri)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">PTT/Posta Masrafı</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(pttMasrafi)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                <span className="text-xs text-slate-600">Diğer Masraflar</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(diger_masraflar)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Toplam Alacak ── */}
+          <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="px-4 py-3 bg-gradient-to-r from-emerald-600 to-emerald-500">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-white">Toplam Alacak</span>
+                <span className="text-sm font-bold text-white">{formatCurrency(toplamAlacak)}</span>
+              </div>
+            </div>
+            <div className="divide-y divide-slate-50">
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">Takip Çıkışı Toplamı</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(anaPara + isleyenFaiz + toplamTakipMasrafi)}</span>
+              </div>
+              <div className="px-4 py-1.5">
+                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Vekalet Ücreti</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                <span className="text-xs text-slate-600 pl-3">Avukatlık Ücreti (%15)</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(vekaletUcreti)}</span>
+              </div>
+              {toplamYargilamaMasrafi > 0 && (
+                <>
+                  <div className="px-4 py-1.5">
+                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Yargılama Masrafları</span>
+                  </div>
+                  {bilirkisiUcreti > 0 && (
+                    <div className="px-4 py-2.5 flex justify-between items-center">
+                      <span className="text-xs text-slate-600 pl-3">Bilirkişi Ücreti</span>
+                      <span className="text-xs font-medium text-slate-700">{formatCurrency(bilirkisiUcreti)}</span>
+                    </div>
+                  )}
+                  {kesfUcreti > 0 && (
+                    <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                      <span className="text-xs text-slate-600 pl-3">Keşif Ücreti</span>
+                      <span className="text-xs font-medium text-slate-700">{formatCurrency(kesfUcreti)}</span>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* ── Tahsil Harcı & Kesintiler ── */}
+          <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-400">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-white">Tahsil Harcı / Kesintiler</span>
+                <span className="text-sm font-bold text-white">{formatCurrency(toplamKesintiler)}</span>
+              </div>
+            </div>
+            <div className="divide-y divide-slate-50">
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">Tahsil Harcı (%{(tahsilHarciOrani * 100).toFixed(2)})</span>
+                <span className="text-xs font-medium text-amber-700">{formatCurrency(tahsilHarci)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                <span className="text-xs text-slate-600">Cezaevi Yapı Harcı (%2)</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(cezaeviYapiHarci)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">Baro Payı (%5)</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(baroPayi)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                <span className="text-xs text-slate-600">Vekalet KDV (%{(kdvOrani * 100).toFixed(0)})</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(vekaletKDV)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Tahsilat Durumu ── */}
+          <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-500">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-white">Tahsilat Durumu</span>
+              </div>
+            </div>
+            <div className="divide-y divide-slate-50">
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">Tahsil Edilen</span>
+                <span className="text-xs font-bold text-emerald-600">{formatCurrency(tahsilEdilen)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                <span className="text-xs text-slate-600">Toplam Gider</span>
+                <span className="text-xs font-bold text-red-600">{formatCurrency(totalExpense)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">Toplam Kesinti</span>
+                <span className="text-xs font-medium text-amber-600">{formatCurrency(toplamKesintiler)}</span>
+              </div>
+              {/* Progress bar */}
+              <div className="px-4 py-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase">Tahsilat Oranı</span>
+                  <span className="text-xs font-bold text-slate-700">{toplamAlacak > 0 ? ((tahsilEdilen / toplamAlacak) * 100).toFixed(1) : '0.0'}%</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-full transition-all" style={{ width: `${Math.min(100, toplamAlacak > 0 ? (tahsilEdilen / toplamAlacak) * 100 : 0)}%` }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Kalan Alacak ── */}
+          <div className="bg-white rounded-xl border-2 border-red-200 shadow-sm overflow-hidden">
+            <div className="px-4 py-3 bg-gradient-to-r from-red-600 to-red-500">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-white">Kalan Alacak</span>
+                <span className="text-sm font-bold text-white">{formatCurrency(kalanToplam)}</span>
+              </div>
+            </div>
+            <div className="divide-y divide-slate-50">
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">Ana Para Kalan</span>
+                <span className="text-xs font-bold text-red-600">{formatCurrency(kalanAnaPara)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center bg-slate-50/50">
+                <span className="text-xs text-slate-600">Faiz Kalan</span>
+                <span className="text-xs font-medium text-red-500">{formatCurrency(kalanFaiz)}</span>
+              </div>
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <span className="text-xs text-slate-600">Vekalet + Masraf Kalan</span>
+                <span className="text-xs font-medium text-slate-700">{formatCurrency(Math.max(0, kalanToplam - kalanAnaPara - kalanFaiz))}</span>
+              </div>
+              <div className="px-4 py-3">
+                <div className="flex items-center justify-between text-[10px] text-slate-400">
+                  <span>Sonraki Faiz İşleniş</span>
+                  <span className="font-medium">+{formatCurrency(gunlukFaiz)}/gün</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ══════════ SAĞ PANEL: Tab İçerikleri ══════════ */}
+        <div className="flex-1 min-w-0">
 
         {/* Tab Content */}
         {activeTab === 'overview' && (
@@ -872,7 +1116,7 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
         )}
 
         {/* ═══════════════ UYAP XML EXPORT TAB ═══════════════ */}
-        {activeTab === 'uyap_xml' && (() => {
+        {activeTab === 'uyap_xml' && ((() => {
           const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <UyapTakipAcma xmlns="http://uyap.gov.tr/icra/takip" versiyon="2.0">
   <TakipBilgileri>
@@ -1042,7 +1286,10 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
               </div>
             </div>
           );
-        })()}
+        })())}
+
+        </div>{/* end right panel */}
+        </div>{/* end 2-column layout */}
       </div>
     </div>
   );
