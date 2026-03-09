@@ -161,6 +161,25 @@ export default function IntegrationsPage() {
     showToast('12 borçluya toplu SMS gönderildi - Kalan kredi: 2,438');
   };
 
+  const handleExportExcel = () => {
+    if (!actionResults || !selectedAction) return;
+    const header = ['Dosya No', 'Borçlu', 'Detay', 'Durum'];
+    const rows = actionResults.items.map(item => [
+      item.caseId,
+      item.debtor,
+      item.detail,
+      item.status === 'success' ? 'Tamamlandı' : item.status === 'pending' ? 'Beklemede' : 'Hata'
+    ]);
+    const csvContent = '\uFEFF' + [header, ...rows].map(r => r.map(c => `"${c}"`).join(';')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${selectedAction.name.replace(/[\s/]/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleActionClick = (action: typeof buyaparActions[0]) => {
     setSelectedAction(action);
     setActionLoading(true);
@@ -620,19 +639,29 @@ export default function IntegrationsPage() {
                 </div>
               ) : null}
             </div>
-            <div className="p-6 border-t border-slate-100 flex justify-between">
+            <div className="p-6 border-t border-slate-100 flex items-center justify-between">
               <button
                 onClick={() => { if (selectedAction) handleActionClick(selectedAction); }}
                 className="px-4 py-2 text-sm font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors flex items-center gap-2"
               >
                 <RefreshCw className="w-4 h-4" /> Yeniden Çalıştır
               </button>
-              <button
-                onClick={() => { setSelectedAction(null); setActionResults(null); }}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
-              >
-                Kapat
-              </button>
+              <div className="flex items-center gap-2">
+                {actionResults && actionResults.items.length > 0 && (
+                  <button
+                    onClick={handleExportExcel}
+                    className="px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors flex items-center gap-2"
+                  >
+                    <Download className="w-4 h-4" /> Excel'e Aktar
+                  </button>
+                )}
+                <button
+                  onClick={() => { setSelectedAction(null); setActionResults(null); }}
+                  className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+                >
+                  Kapat
+                </button>
+              </div>
             </div>
           </div>
         </div>
