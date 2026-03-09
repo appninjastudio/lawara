@@ -544,25 +544,26 @@ export default function CasesPage() {
                     {cases.map((c) => (
                       <tr 
                         key={c.id} 
+                        onClick={() => window.location.href = `/cases/${c.id}`}
                         className={clsx(
-                          'hover:bg-slate-50 transition-colors',
+                          'hover:bg-slate-50 transition-colors cursor-pointer',
                           selectedCases.includes(c.id) && 'bg-icra-light/5'
                         )}
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4" onClick={e => e.stopPropagation()}>
                           <input
                             type="checkbox"
                             checked={selectedCases.includes(c.id)}
                             onChange={() => toggleSelect(c.id)}
-                            className="w-4 h-4 rounded border-slate-300 text-icra-mid focus:ring-icra-mid"
+                            className="w-4 h-4 rounded border-slate-300 text-icra-mid focus:ring-icra-mid cursor-pointer"
                           />
                         </td>
                         <td className="px-6 py-4">
-                          <span className="text-sm font-semibold text-slate-900">{c.caseNumber}</span>
+                          <a href={`/cases/${c.id}`} onClick={e => e.stopPropagation()} className="text-sm font-semibold text-icra-mid hover:text-icra-dark hover:underline">{c.caseNumber}</a>
                         </td>
                         <td className="px-6 py-4">
                           <div>
-                            <p className="text-sm font-medium text-slate-900">{c.debtor.firstName} {c.debtor.lastName}</p>
+                            <a href={`/cases/${c.id}`} onClick={e => e.stopPropagation()} className="text-sm font-medium text-slate-900 hover:text-icra-dark hover:underline">{c.debtor.firstName} {c.debtor.lastName}</a>
                             <p className="text-xs text-slate-500">{formatDate(c.openDate)}</p>
                           </div>
                         </td>
@@ -593,19 +594,21 @@ export default function CasesPage() {
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-600">{c.court.name}</td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center justify-end gap-1">
-                            <a href={`/cases/${c.id}`} className="p-2 text-slate-400 hover:text-icra-mid hover:bg-icra-light/10 rounded-lg transition-colors">
+                          <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
+                            <a href={`/cases/${c.id}`} className="p-2 text-slate-400 hover:text-icra-mid hover:bg-icra-light/10 rounded-lg transition-colors" title="Görüntüle">
                               <Eye className="w-4 h-4" />
                             </a>
                             <button
                               onClick={() => openEditModal(c)}
                               className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                              title="Düzenle"
                             >
                               <Edit2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setDeleteConfirm(c.id)}
                               className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Sil"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
