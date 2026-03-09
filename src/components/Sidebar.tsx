@@ -10,6 +10,7 @@ import {
   Settings,
   Scale,
   PhoneCall,
+  BarChart3,
   ChevronLeft,
   ChevronRight,
   LogOut
@@ -37,6 +38,11 @@ const navItems = [
     name: 'Entegrasyon',
     href: '/integrations',
     icon: Link2
+  },
+  {
+    name: 'Raporlama',
+    href: '/reports',
+    icon: BarChart3
   },
   {
     name: 'İcra Caller',
