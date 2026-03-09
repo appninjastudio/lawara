@@ -1154,51 +1154,6 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
             </div>
           </div>
 
-          {/* ── 5. HACİZ ÖZETİ ── */}
-          <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
-            <div className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-purple-500 flex items-center justify-between">
-              <span className="text-[10px] font-bold text-white uppercase tracking-wider">Haciz Özeti</span>
-              <span className="text-xs font-bold text-white">{caseData.seizures?.length || 0}</span>
-            </div>
-            <div className="divide-y divide-slate-50 text-[11px]">
-              {[
-                { type: 'bank', label: 'Banka', icon: Banknote, color: 'text-icra-dark' },
-                { type: 'vehicle', label: 'Araç', icon: Car, color: 'text-cyan-600' },
-                { type: 'property', label: 'Taşınmaz', icon: Home, color: 'text-emerald-600' },
-                { type: 'salary', label: 'Maaş', icon: Briefcase, color: 'text-purple-600' },
-                { type: 'receivable', label: 'Alacak', icon: DollarSign, color: 'text-amber-600' },
-              ].map(h => {
-                const cnt = caseData.seizures?.filter(s => s.type === h.type).length || 0;
-                const HIcon = h.icon;
-                return (
-                  <div key={h.type} className="px-3 py-1 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <HIcon className={`w-3 h-3 ${h.color}`} />
-                      <span className="text-slate-600">{h.label}</span>
-                    </div>
-                    <span className={`font-bold ${cnt > 0 ? h.color : 'text-slate-300'}`}>{cnt}</span>
-                  </div>
-                );
-              })}
-              {caseData.seizures && caseData.seizures.length > 0 && (() => {
-                const toplamBlokeBank = caseData.seizures.filter(s => s.type === 'bank').reduce((sum, s) => sum + (s.details.blockedAmount || 0), 0);
-                const toplamAracDeger = caseData.seizures.filter(s => s.type === 'vehicle').reduce((sum, s) => sum + (s.details.estimatedValue || 0), 0);
-                const toplamTasinmazDeger = caseData.seizures.filter(s => s.type === 'property').reduce((sum, s) => sum + (s.details.estimatedValue || 0), 0);
-                const toplamMaasKesinti = caseData.seizures.filter(s => s.type === 'salary').reduce((sum, s) => sum + (s.details.deductionAmount || 0), 0);
-                const toplamHacizDeger = toplamBlokeBank + toplamAracDeger + toplamTasinmazDeger;
-                return (
-                  <>
-                    {toplamBlokeBank > 0 && <div className="px-3 py-1 flex justify-between bg-slate-50/50"><span className="text-slate-500 pl-4">Bloke</span><span className="font-semibold text-emerald-600">{formatCurrency(toplamBlokeBank)}</span></div>}
-                    {toplamAracDeger > 0 && <div className="px-3 py-1 flex justify-between"><span className="text-slate-500 pl-4">Araç Değ.</span><span className="font-semibold text-cyan-600">{formatCurrency(toplamAracDeger)}</span></div>}
-                    {toplamTasinmazDeger > 0 && <div className="px-3 py-1 flex justify-between bg-slate-50/50"><span className="text-slate-500 pl-4">Taşınmaz Değ.</span><span className="font-semibold text-emerald-600">{formatCurrency(toplamTasinmazDeger)}</span></div>}
-                    {toplamMaasKesinti > 0 && <div className="px-3 py-1 flex justify-between"><span className="text-slate-500 pl-4">Maaş Kes.</span><span className="font-semibold text-purple-600">{formatCurrency(toplamMaasKesinti)}/ay</span></div>}
-                    {toplamHacizDeger > 0 && <div className="px-3 py-1 flex justify-between bg-purple-50/50 font-semibold"><span className="text-purple-700">Toplam</span><span className="text-purple-700">{formatCurrency(toplamHacizDeger)}</span></div>}
-                  </>
-                );
-              })()}
-            </div>
-          </div>
-
         </div>{/* end right financial panel */}
 
         </div>{/* end 2-column layout */}
