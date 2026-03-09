@@ -1068,59 +1068,6 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
         {/* ══════════ SAĞ PANEL: Komple Detaylı Gelir-Gider Tablosu ══════════ */}
         <div className="w-[420px] flex-shrink-0 space-y-3 sticky top-6">
 
-          {/* ── Borçlu Kimlik Kartı ── */}
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="px-4 py-3 bg-gradient-to-r from-red-600 to-red-500">
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4 text-white" />
-                <span className="text-sm font-bold text-white">Borçlu Bilgileri</span>
-              </div>
-            </div>
-            <div className="divide-y divide-slate-50 text-xs">
-              <div className="px-4 py-2 flex justify-between"><span className="text-slate-500">Ad Soyad</span><span className="font-semibold text-slate-900">{caseData.debtor.firstName} {caseData.debtor.lastName}</span></div>
-              <div className="px-4 py-2 flex justify-between bg-slate-50/50"><span className="text-slate-500">TC Kimlik No</span><span className="font-mono font-semibold text-slate-900">{caseData.debtor.tcNo}</span></div>
-              {caseData.debtor.phone && <div className="px-4 py-2 flex justify-between"><span className="text-slate-500">Telefon</span><span className="font-medium">{caseData.debtor.phone}</span></div>}
-              {caseData.debtor.email && <div className="px-4 py-2 flex justify-between bg-slate-50/50"><span className="text-slate-500">E-posta</span><span className="font-medium">{caseData.debtor.email}</span></div>}
-              {caseData.debtor.address && <div className="px-4 py-2 flex justify-between"><span className="text-slate-500">Adres</span><span className="font-medium text-right max-w-[55%]">{caseData.debtor.address}, {caseData.debtor.district}/{caseData.debtor.city}</span></div>}
-            </div>
-          </div>
-
-          {/* ── Dosya Özet Kartları ── */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white rounded-xl border border-slate-100 p-3 shadow-sm text-center">
-              <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Ana Para</p>
-              <p className="text-lg font-bold text-slate-900">{formatCurrency(anaPara)}</p>
-            </div>
-            <div className="bg-white rounded-xl border border-slate-100 p-3 shadow-sm text-center">
-              <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Faiz</p>
-              <p className="text-lg font-bold text-amber-600">{formatCurrency(isleyenFaiz)}</p>
-            </div>
-            <div className="bg-white rounded-xl border border-slate-100 p-3 shadow-sm text-center">
-              <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Toplam Alacak</p>
-              <p className="text-lg font-bold text-icra-dark">{formatCurrency(toplamAlacak)}</p>
-            </div>
-            <div className="bg-white rounded-xl border border-slate-100 p-3 shadow-sm text-center">
-              <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Tahsilat</p>
-              <p className="text-lg font-bold text-emerald-600">{formatCurrency(tahsilEdilen)}</p>
-              <p className="text-[10px] text-slate-400">Kalan: {formatCurrency(kalanToplam)}</p>
-            </div>
-          </div>
-
-          {/* ── Hesap Tarihi ── */}
-          <div className="bg-white rounded-xl border border-slate-100 p-3 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Hesap Tarihi</span>
-              </div>
-              <span className="text-xs text-slate-400">{gecenGun} gün</span>
-            </div>
-            <div className="flex items-center justify-between mt-1">
-              <p className="text-sm font-bold text-slate-900">{bugun.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
-              <span className="text-[10px] text-amber-600 font-medium">+{formatCurrency(gunlukFaiz)}/gün faiz</span>
-            </div>
-          </div>
-
           {/* ── 1. ALACAK KALEMLERİ ── */}
           <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="px-4 py-2.5 bg-gradient-to-r from-icra-dark to-icra-mid">
@@ -1269,29 +1216,6 @@ export default function CaseDetailPage({ params }: { params: Promise<{ id: strin
                   </>
                 );
               })()}
-            </div>
-          </div>
-
-          {/* ── 6. DOSYA BİLGİLERİ ── */}
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="px-4 py-2.5 bg-gradient-to-r from-slate-700 to-slate-600">
-              <div className="flex items-center gap-2">
-                <FileText className="w-3.5 h-3.5 text-white" />
-                <span className="text-xs font-bold text-white uppercase tracking-wider">Dosya Bilgileri</span>
-              </div>
-            </div>
-            <div className="divide-y divide-slate-50 text-xs">
-              <div className="px-4 py-2 flex justify-between"><span className="text-slate-500">Dosya No</span><span className="font-semibold text-slate-900">{caseData.caseNumber}</span></div>
-              {caseData.foyNumber && <div className="px-4 py-2 flex justify-between bg-slate-50/50"><span className="text-slate-500">Föy No</span><span className="font-medium">{caseData.foyNumber}</span></div>}
-              <div className="px-4 py-2 flex justify-between"><span className="text-slate-500">Takip Türü</span><span className="font-medium">{typeLabels[caseData.caseType] || caseData.caseType}</span></div>
-              <div className="px-4 py-2 flex justify-between bg-slate-50/50"><span className="text-slate-500">İcra Dairesi</span><span className="font-medium text-right max-w-[55%]">{caseData.court.name}</span></div>
-              <div className="px-4 py-2 flex justify-between"><span className="text-slate-500">Şehir / İlçe</span><span className="font-medium">{caseData.court.city} / {caseData.court.district}</span></div>
-              <div className="px-4 py-2 flex justify-between bg-slate-50/50"><span className="text-slate-500">Açılış Tarihi</span><span className="font-medium">{formatDate(caseData.openDate)}</span></div>
-              <div className="px-4 py-2 flex justify-between"><span className="text-slate-500">Alacaklı</span><span className="font-semibold text-right max-w-[55%]">{caseData.creditor.name}</span></div>
-              <div className="px-4 py-2 flex justify-between bg-slate-50/50"><span className="text-slate-500">Avukat</span><span className="font-medium">{caseData.createdBy.name}</span></div>
-              <div className="px-4 py-2 flex justify-between"><span className="text-slate-500">Dava Sayısı</span><span className="font-medium">{caseData.lawsuits?.length || 0}</span></div>
-              <div className="px-4 py-2 flex justify-between bg-slate-50/50"><span className="text-slate-500">Tebligat Sayısı</span><span className="font-medium">{caseData.tebligats?.length || 0}</span></div>
-              <div className="px-4 py-2 flex justify-between"><span className="text-slate-500">Taahhüt Sayısı</span><span className="font-medium">{caseData.commitments?.length || 0}</span></div>
             </div>
           </div>
 
