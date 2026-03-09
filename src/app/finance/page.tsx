@@ -17,7 +17,8 @@ import {
   AlertTriangle,
   Loader2,
   Plus,
-  X
+  X,
+  Download
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import clsx from 'clsx';
@@ -85,7 +86,7 @@ export default function FinancePage() {
   const [transactionList, setTransactionList] = useState<TransactionItem[]>([]);
   const [showNewCommitment, setShowNewCommitment] = useState(false);
   const [cases, setCases] = useState<CaseLookup[]>([]);
-  const [newForm, setNewForm] = useState({ caseId: '', totalAmount: '', installmentCount: '', startDate: '' });
+  const [newForm, setNewForm] = useState({ caseId: '', totalAmount: '', installmentCount: '', startDate: '', source: 'manual' as 'manual' | 'uyap', document: null as File | null });
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
   const [showViolationReport, setShowViolationReport] = useState(false);
@@ -280,14 +281,16 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
     setDraftReady(true);
   };
 
-  const handleDownloadDraft = () => {
+  const handleDownloadDraft = (format: 'pdf' | 'word' | 'udf') => {
     if (!draftContent || !draftTarget) return;
-    const typeLabel = reportTypes.find(r => r.id === draftType)?.label || draftType;
-    const blob = new Blob([draftContent], { type: 'text/plain;charset=utf-8;' });
+    const fileName = `${draftTarget.caseId.replace('/', '-')}_${draftType}_${new Date().toISOString().slice(0, 10)}`;
+    const mimeTypes = { pdf: 'application/pdf', word: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', udf: 'application/octet-stream' };
+    const extensions = { pdf: '.pdf', word: '.docx', udf: '.udf' };
+    const blob = new Blob([draftContent], { type: mimeTypes[format] });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${draftTarget.caseId.replace('/', '-')}_${draftType}_${new Date().toISOString().slice(0, 10)}.txt`;
+    a.download = `${fileName}${extensions[format]}`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -354,7 +357,7 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
         if (commitmentStats) {
           setCommitmentStats({ ...commitmentStats, total: commitmentStats.total + 1, active: commitmentStats.active + 1 });
         }
-        setNewForm({ caseId: '', totalAmount: '', installmentCount: '', startDate: '' });
+        setNewForm({ caseId: '', totalAmount: '', installmentCount: '', startDate: '', source: 'manual', document: null });
         setShowNewCommitment(false);
       } else {
         setCreateError(json.error || 'Taahhüt oluşturulamadı');
@@ -1008,11 +1011,25 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
                         Kopyala
                       </button>
                       <button
-                        onClick={handleDownloadDraft}
+                        onClick={() => handleDownloadDraft('pdf')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        PDF
+                      </button>
+                      <button
+                        onClick={() => handleDownloadDraft('word')}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
                       >
-                        <ArrowRight className="w-3.5 h-3.5" />
-                        İndir (.txt)
+                        <Download className="w-3.5 h-3.5" />
+                        Word
+                      </button>
+                      <button
+                        onClick={() => handleDownloadDraft('udf')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        UDF
                       </button>
                     </div>
                   </div>
@@ -1069,6 +1086,68 @@ Bu rapor Lawara sistemi tarafından otomatik oluşturulmuştur.`,
             <div className="p-6 space-y-4">
               {createError && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{createError}</div>
+              )}
+              {/* Kaynak Seçimi */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Kaynak</label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setNewForm(prev => ({ ...prev, source: 'manual' }))}
+                    className={clsx(
+                      'flex-1 py-2 px-3 rounded-xl text-sm font-medium border transition-all',
+                      newForm.source === 'manual'
+                        ? 'bg-icra-mid text-white border-icra-mid'
+                        : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                    )}
+                  >
+                    Manuel Giriş
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewForm(prev => ({ ...prev, source: 'uyap' }))}
+                    className={clsx(
+                      'flex-1 py-2 px-3 rounded-xl text-sm font-medium border transition-all',
+                      newForm.source === 'uyap'
+                        ? 'bg-orange-500 text-white border-orange-500'
+                        : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                    )}
+                  >
+                    UYAP Belgesi Yükle
+                  </button>
+                </div>
+              </div>
+              {/* Belge Yükleme (UYAP seçiliyse) */}
+              {newForm.source === 'uyap' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">UYAP Belgesi / Dosya Yükle</label>
+                  <div className="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:border-orange-400 transition-colors">
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,.udf,.xml,.jpg,.jpeg,.png"
+                      onChange={(e) => setNewForm(prev => ({ ...prev, document: e.target.files?.[0] || null }))}
+                      className="hidden"
+                      id="commitment-file"
+                    />
+                    <label htmlFor="commitment-file" className="cursor-pointer">
+                      {newForm.document ? (
+                        <div className="flex items-center justify-center gap-2 text-sm text-orange-600 font-medium">
+                          <FileText className="w-5 h-5" />
+                          {newForm.document.name}
+                          <button type="button" onClick={(e) => { e.preventDefault(); setNewForm(prev => ({ ...prev, document: null })); }} className="ml-2 p-1 hover:bg-red-50 rounded">
+                            <X className="w-3.5 h-3.5 text-red-500" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div>
+                          <Download className="w-6 h-6 text-slate-400 mx-auto mb-1" />
+                          <p className="text-sm text-slate-500">Belge yüklemek için tıklayın</p>
+                          <p className="text-xs text-slate-400 mt-0.5">PDF, Word, UDF, XML, Resim</p>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                </div>
               )}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Dosya *</label>
