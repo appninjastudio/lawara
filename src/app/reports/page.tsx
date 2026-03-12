@@ -94,11 +94,11 @@ export default function ReportsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex flex-col h-full">
       <Header title="Raporlama" subtitle="Detaylı analiz ve raporlar" />
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="flex-1 p-6 space-y-6 overflow-auto">
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Raporlama</h1>
             <p className="text-sm text-slate-500 mt-1">Detaylı analiz ve raporlar</p>
