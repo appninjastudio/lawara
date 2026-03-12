@@ -18,7 +18,19 @@ import {
   X,
   Copy,
   FileText,
-  Loader2
+  Loader2,
+  User,
+  Building2,
+  Calendar,
+  Phone,
+  Mail,
+  MapPin,
+  CreditCard,
+  Scale,
+  Hash,
+  FileCheck,
+  Info,
+  CheckCircle2
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
@@ -83,7 +95,15 @@ export default function CasesPage() {
   const [newCaseForm, setNewCaseForm] = useState({
     caseNumber: '', debtorId: '', creditorId: '', courtId: '',
     principalAmount: '', interestAmount: '', caseType: 'ilamsiz', foyNumber: '',
+    // Borçlu detay
+    debtorTcNo: '', debtorPhone: '', debtorEmail: '', debtorAddress: '',
+    // Alacak detay
+    courtFee: '', lawyerFee: '', otherExpenses: '', interestRate: '', interestStartDate: '',
+    // Dosya detay
+    openDate: '', dueDate: '', description: '', priority: 'normal' as 'low' | 'normal' | 'high' | 'urgent',
+    paymentType: 'nakit' as string, collateral: '',
   });
+  const [formStep, setFormStep] = useState(1);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -172,7 +192,8 @@ export default function CasesPage() {
       const json = await res.json();
       if (json.success) {
         setShowNewCaseModal(false);
-        setNewCaseForm({ caseNumber: '', debtorId: '', creditorId: '', courtId: '', principalAmount: '', interestAmount: '', caseType: 'ilamsiz', foyNumber: '' });
+        setNewCaseForm({ caseNumber: '', debtorId: '', creditorId: '', courtId: '', principalAmount: '', interestAmount: '', caseType: 'ilamsiz', foyNumber: '', debtorTcNo: '', debtorPhone: '', debtorEmail: '', debtorAddress: '', courtFee: '', lawyerFee: '', otherExpenses: '', interestRate: '', interestStartDate: '', openDate: '', dueDate: '', description: '', priority: 'normal', paymentType: 'nakit', collateral: '' });
+        setFormStep(1);
         fetchCases();
       } else {
         setCreateError(json.error || 'Dosya oluşturulamadı');
@@ -692,138 +713,297 @@ export default function CasesPage() {
         </div>
       )}
 
-      {/* New Case Modal */}
+      {/* New Case Modal - 3 Step */}
       {showNewCaseModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-auto">
-            <div className="p-6 border-b border-slate-100">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="p-5 border-b border-slate-100 bg-gradient-to-r from-icra-light/10 to-icra-mid/10">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-900">Yeni Dosya Oluştur</h3>
-                <button onClick={() => setShowNewCaseModal(false)} className="p-1 hover:bg-slate-100 rounded-lg">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">Yeni Dosya Oluştur</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Tüm bilgileri eksiksiz doldurun</p>
+                </div>
+                <button onClick={() => { setShowNewCaseModal(false); setFormStep(1); }} className="p-1.5 hover:bg-slate-100 rounded-lg">
                   <X className="w-5 h-5 text-slate-400" />
                 </button>
               </div>
+              {/* Step Indicator */}
+              <div className="flex items-center gap-2 mt-4">
+                {[
+                  { step: 1, label: 'Dosya Bilgileri', icon: FileText },
+                  { step: 2, label: 'Borçlu & Alacaklı', icon: User },
+                  { step: 3, label: 'Alacak & Ek Bilgiler', icon: CreditCard },
+                ].map((s) => (
+                  <button key={s.step} onClick={() => setFormStep(s.step)} className={clsx('flex-1 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all', formStep === s.step ? 'bg-icra-mid text-white shadow-sm' : formStep > s.step ? 'bg-emerald-100 text-emerald-700' : 'bg-white text-slate-500 border border-slate-200')}>
+                    <s.icon className="w-3.5 h-3.5" />
+                    <span>{s.label}</span>
+                    {formStep > s.step && <CheckCircle2 className="w-3.5 h-3.5 ml-auto" />}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="p-6 space-y-5">
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6">
               {createError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{createError}</div>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 mb-4">{createError}</div>
               )}
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Dosya Numarası *</label>
-                  <input
-                    type="text"
-                    placeholder="2024/1250"
-                    value={newCaseForm.caseNumber}
-                    onChange={e => setNewCaseForm(f => ({ ...f, caseNumber: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
-                  />
+              {/* STEP 1 - Dosya Bilgileri */}
+              {formStep === 1 && (
+                <div className="space-y-5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <FileText className="w-4 h-4 text-icra-mid" />
+                    <h4 className="text-sm font-semibold text-slate-800">Temel Dosya Bilgileri</h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Dosya Numarası *</label>
+                      <div className="relative">
+                        <Hash className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input type="text" placeholder="2024/1250" value={newCaseForm.caseNumber} onChange={e => setNewCaseForm(f => ({ ...f, caseNumber: e.target.value }))} className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Föy Numarası</label>
+                      <div className="relative">
+                        <FileCheck className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input type="text" placeholder="Y101" value={newCaseForm.foyNumber} onChange={e => setNewCaseForm(f => ({ ...f, foyNumber: e.target.value }))} className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Dosya Türü *</label>
+                      <select value={newCaseForm.caseType} onChange={e => setNewCaseForm(f => ({ ...f, caseType: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid">
+                        <option value="ilamsiz">İlamsız İcra</option>
+                        <option value="ilamli">İlamlı İcra</option>
+                        <option value="kambiyo">Kambiyo Senetleri</option>
+                        <option value="kira">Kira Alacağı</option>
+                        <option value="rehin">Rehnin Paraya Çevrilmesi</option>
+                        <option value="nafaka">Nafaka Alacağı</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Öncelik</label>
+                      <select value={newCaseForm.priority} onChange={e => setNewCaseForm(f => ({ ...f, priority: e.target.value as typeof newCaseForm.priority }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid">
+                        <option value="low">Düşük</option>
+                        <option value="normal">Normal</option>
+                        <option value="high">Yüksek</option>
+                        <option value="urgent">Acil</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">İcra Dairesi *</label>
+                    <div className="relative">
+                      <Scale className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <select value={newCaseForm.courtId} onChange={e => setNewCaseForm(f => ({ ...f, courtId: e.target.value }))} className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid appearance-none">
+                        <option value="">İcra dairesi seçin...</option>
+                        {lookups?.courts.map(c => (<option key={c.id} value={c.id}>{c.name} - {c.city}</option>))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Dosya Açılış Tarihi</label>
+                      <div className="relative">
+                        <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input type="date" value={newCaseForm.openDate} onChange={e => setNewCaseForm(f => ({ ...f, openDate: e.target.value }))} className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Vade Tarihi</label>
+                      <div className="relative">
+                        <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input type="date" value={newCaseForm.dueDate} onChange={e => setNewCaseForm(f => ({ ...f, dueDate: e.target.value }))} className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid" />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Açıklama / Not</label>
+                    <textarea placeholder="Dosya hakkında ek bilgi..." value={newCaseForm.description} onChange={e => setNewCaseForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid resize-none" />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Föy Numarası</label>
-                  <input
-                    type="text"
-                    placeholder="Y101"
-                    value={newCaseForm.foyNumber}
-                    onChange={e => setNewCaseForm(f => ({ ...f, foyNumber: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
-                  />
-                </div>
-              </div>
+              )}
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Borçlu *</label>
-                <select
-                  value={newCaseForm.debtorId}
-                  onChange={e => setNewCaseForm(f => ({ ...f, debtorId: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
-                >
-                  <option value="">Borçlu seçin...</option>
-                  {lookups?.debtors.map(d => (
-                    <option key={d.id} value={d.id}>{d.firstName} {d.lastName} - {d.tcNo}</option>
-                  ))}
-                </select>
-              </div>
+              {/* STEP 2 - Borçlu & Alacaklı */}
+              {formStep === 2 && (
+                <div className="space-y-5">
+                  {/* Borçlu */}
+                  <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-xl space-y-4">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-blue-600" />
+                      <h4 className="text-sm font-semibold text-blue-800">Borçlu Bilgileri</h4>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Borçlu Seçin *</label>
+                      <select value={newCaseForm.debtorId} onChange={e => setNewCaseForm(f => ({ ...f, debtorId: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+                        <option value="">Borçlu seçin...</option>
+                        {lookups?.debtors.map(d => (<option key={d.id} value={d.id}>{d.firstName} {d.lastName} - {d.tcNo}</option>))}
+                      </select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">TC Kimlik No</label>
+                        <div className="relative">
+                          <Hash className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input type="text" placeholder="12345678901" maxLength={11} value={newCaseForm.debtorTcNo} onChange={e => setNewCaseForm(f => ({ ...f, debtorTcNo: e.target.value }))} className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">Telefon</label>
+                        <div className="relative">
+                          <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input type="tel" placeholder="0532 123 4567" value={newCaseForm.debtorPhone} onChange={e => setNewCaseForm(f => ({ ...f, debtorPhone: e.target.value }))} className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white" />
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">E-posta</label>
+                      <div className="relative">
+                        <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input type="email" placeholder="borclu@email.com" value={newCaseForm.debtorEmail} onChange={e => setNewCaseForm(f => ({ ...f, debtorEmail: e.target.value }))} className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Adres</label>
+                      <div className="relative">
+                        <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                        <textarea placeholder="Borçlu adresi..." value={newCaseForm.debtorAddress} onChange={e => setNewCaseForm(f => ({ ...f, debtorAddress: e.target.value }))} rows={2} className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white resize-none" />
+                      </div>
+                    </div>
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Alacaklı *</label>
-                <select
-                  value={newCaseForm.creditorId}
-                  onChange={e => setNewCaseForm(f => ({ ...f, creditorId: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
-                >
-                  <option value="">Alacaklı seçin...</option>
-                  {lookups?.creditors.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} ({c.type})</option>
-                  ))}
-                </select>
-              </div>
+                  {/* Alacaklı */}
+                  <div className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-xl space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-emerald-600" />
+                      <h4 className="text-sm font-semibold text-emerald-800">Alacaklı Bilgileri</h4>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Alacaklı Seçin *</label>
+                      <select value={newCaseForm.creditorId} onChange={e => setNewCaseForm(f => ({ ...f, creditorId: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-white">
+                        <option value="">Alacaklı seçin...</option>
+                        {lookups?.creditors.map(c => (<option key={c.id} value={c.id}>{c.name} ({c.type})</option>))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">İcra Dairesi *</label>
-                <select
-                  value={newCaseForm.courtId}
-                  onChange={e => setNewCaseForm(f => ({ ...f, courtId: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
-                >
-                  <option value="">İcra dairesi seçin...</option>
-                  {lookups?.courts.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} - {c.city}</option>
-                  ))}
-                </select>
-              </div>
+              {/* STEP 3 - Alacak & Ek Bilgiler */}
+              {formStep === 3 && (
+                <div className="space-y-5">
+                  {/* Alacak Detay */}
+                  <div className="p-4 bg-amber-50/50 border border-amber-100 rounded-xl space-y-4">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-amber-600" />
+                      <h4 className="text-sm font-semibold text-amber-800">Alacak Detayları</h4>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">Ana Para (₺) *</label>
+                        <input type="number" placeholder="50000" value={newCaseForm.principalAmount} onChange={e => setNewCaseForm(f => ({ ...f, principalAmount: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">İşlemiş Faiz (₺)</label>
+                        <input type="number" placeholder="0" value={newCaseForm.interestAmount} onChange={e => setNewCaseForm(f => ({ ...f, interestAmount: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">Faiz Oranı (%)</label>
+                        <input type="number" placeholder="24" value={newCaseForm.interestRate} onChange={e => setNewCaseForm(f => ({ ...f, interestRate: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">Faiz Başlangıç</label>
+                        <input type="date" value={newCaseForm.interestStartDate} onChange={e => setNewCaseForm(f => ({ ...f, interestStartDate: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">Ödeme Türü</label>
+                        <select value={newCaseForm.paymentType} onChange={e => setNewCaseForm(f => ({ ...f, paymentType: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white">
+                          <option value="nakit">Nakit</option>
+                          <option value="havale">Havale/EFT</option>
+                          <option value="kredi_karti">Kredi Kartı</option>
+                          <option value="cek">Çek</option>
+                          <option value="senet">Senet</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Ana Para (₺) *</label>
-                  <input
-                    type="number"
-                    placeholder="50000"
-                    value={newCaseForm.principalAmount}
-                    onChange={e => setNewCaseForm(f => ({ ...f, principalAmount: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
-                  />
+                  {/* Masraflar */}
+                  <div className="p-4 bg-purple-50/50 border border-purple-100 rounded-xl space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Scale className="w-4 h-4 text-purple-600" />
+                      <h4 className="text-sm font-semibold text-purple-800">Masraf & Teminat</h4>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">Mahkeme Harcı (₺)</label>
+                        <input type="number" placeholder="0" value={newCaseForm.courtFee} onChange={e => setNewCaseForm(f => ({ ...f, courtFee: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">Avukatlık Ücreti (₺)</label>
+                        <input type="number" placeholder="0" value={newCaseForm.lawyerFee} onChange={e => setNewCaseForm(f => ({ ...f, lawyerFee: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1">Diğer Masraf (₺)</label>
+                        <input type="number" placeholder="0" value={newCaseForm.otherExpenses} onChange={e => setNewCaseForm(f => ({ ...f, otherExpenses: e.target.value }))} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-600 mb-1">Teminat Bilgisi</label>
+                      <textarea placeholder="Varsa teminat detaylarını girin (ipotek, rehin, kefil vb.)" value={newCaseForm.collateral} onChange={e => setNewCaseForm(f => ({ ...f, collateral: e.target.value }))} rows={2} className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white resize-none" />
+                    </div>
+                  </div>
+
+                  {/* Özet */}
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Info className="w-4 h-4 text-slate-500" />
+                      <h4 className="text-sm font-semibold text-slate-700">Dosya Özeti</h4>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
+                      <div className="flex justify-between"><span className="text-slate-500">Dosya No:</span><span className="font-medium text-slate-800">{newCaseForm.caseNumber || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-500">Föy No:</span><span className="font-medium text-slate-800">{newCaseForm.foyNumber || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-500">Dosya Türü:</span><span className="font-medium text-slate-800">{{ ilamsiz: 'İlamsız', ilamli: 'İlamlı', kambiyo: 'Kambiyo', kira: 'Kira', rehin: 'Rehin', nafaka: 'Nafaka' }[newCaseForm.caseType] || newCaseForm.caseType}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-500">Ana Para:</span><span className="font-semibold text-slate-900">{newCaseForm.principalAmount ? `₺${Number(newCaseForm.principalAmount).toLocaleString('tr-TR')}` : '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-500">Faiz:</span><span className="font-medium text-slate-800">{newCaseForm.interestAmount ? `₺${Number(newCaseForm.interestAmount).toLocaleString('tr-TR')}` : '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-500">Toplam:</span><span className="font-bold text-icra-mid">{(newCaseForm.principalAmount || newCaseForm.interestAmount) ? `₺${(Number(newCaseForm.principalAmount || 0) + Number(newCaseForm.interestAmount || 0)).toLocaleString('tr-TR')}` : '-'}</span></div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Faiz (₺)</label>
-                  <input
-                    type="number"
-                    placeholder="0"
-                    value={newCaseForm.interestAmount}
-                    onChange={e => setNewCaseForm(f => ({ ...f, interestAmount: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Dosya Türü</label>
-                  <select
-                    value={newCaseForm.caseType}
-                    onChange={e => setNewCaseForm(f => ({ ...f, caseType: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-icra-mid"
-                  >
-                    <option value="ilamsiz">İlamsız</option>
-                    <option value="ilamli">İlamlı</option>
-                    <option value="kambiyo">Kambiyo</option>
-                  </select>
-                </div>
-              </div>
+              )}
             </div>
-            <div className="p-6 border-t border-slate-100 flex justify-end gap-3">
-              <button
-                onClick={() => setShowNewCaseModal(false)}
-                className="px-5 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"
-              >
-                İptal
-              </button>
-              <button
-                onClick={handleCreateCase}
-                disabled={creating}
-                className="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 flex items-center gap-2"
-              >
-                {creating && <Loader2 className="w-4 h-4 animate-spin" />}
-                Dosya Oluştur
-              </button>
+
+            {/* Footer */}
+            <div className="p-5 border-t border-slate-100 flex items-center justify-between">
+              <div className="text-xs text-slate-400">Adım {formStep}/3</div>
+              <div className="flex items-center gap-3">
+                {formStep > 1 && (
+                  <button onClick={() => setFormStep(formStep - 1)} className="px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors flex items-center gap-1.5">
+                    <ChevronLeft className="w-4 h-4" /> Geri
+                  </button>
+                )}
+                {formStep === 1 && (
+                  <button onClick={() => { setShowNewCaseModal(false); setFormStep(1); }} className="px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors">
+                    İptal
+                  </button>
+                )}
+                {formStep < 3 ? (
+                  <button onClick={() => setFormStep(formStep + 1)} className="px-5 py-2.5 text-sm font-medium text-white bg-icra-mid rounded-xl hover:bg-icra-dark transition-colors flex items-center gap-1.5">
+                    İleri <ChevronRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button onClick={handleCreateCase} disabled={creating} className="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 flex items-center gap-2">
+                    {creating && <Loader2 className="w-4 h-4 animate-spin" />}
+                    Dosya Oluştur
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
