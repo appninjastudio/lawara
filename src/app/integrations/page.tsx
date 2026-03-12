@@ -192,7 +192,7 @@ export default function IntegrationsPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <Header title="Entegrasyon Merkezi" subtitle="UYAP, Buyapar ve SMS entegrasyonları" />
+      <Header title="Entegrasyon Merkezi" subtitle="UYAP ve SMS entegrasyonları" />
       
       <div className="flex-1 p-6 space-y-6">
         {/* Connection Status Cards */}
@@ -294,7 +294,7 @@ export default function IntegrationsPage() {
           </div>
         </div>
 
-        {/* Buyapar Hızlı İşlemler */}
+        {/* UYAP Hızlı İşlemler */}
         <div className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl p-6 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -302,12 +302,12 @@ export default function IntegrationsPage() {
                 <Zap className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-lg">Buyapar Hızlı İşlemler</h3>
-                <p className="text-orange-100 text-sm">UYAP entegrasyonu ile hızlı işlem yapın</p>
+                <h3 className="font-bold text-white text-lg">UYAP Hızlı İşlemler</h3>
+                <p className="text-orange-100 text-sm">Toplu haciz, tebligat ve sorgu işlemleri</p>
               </div>
             </div>
             <span className="px-3 py-1 bg-white/20 rounded-full text-white text-sm font-medium">
-              Buyapar ile Entegre
+              UYAP Entegre
             </span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -331,9 +331,9 @@ export default function IntegrationsPage() {
             <span className="text-orange-100 text-sm">Toplam 11 hızlı işlem türü</span>
             <button
               onClick={() => setShowAllBuyapar(!showAllBuyapar)}
-              className="flex items-center gap-1 text-white text-sm font-medium hover:underline"
+              className="flex items-center gap-2 px-4 py-2 bg-white/25 hover:bg-white/40 text-white text-sm font-bold rounded-xl transition-all shadow-sm border border-white/30"
             >
-              {showAllBuyapar ? 'Daralt' : 'Tümünü Gör'} <ChevronRight className={`w-4 h-4 transition-transform ${showAllBuyapar ? 'rotate-90' : ''}`} />
+              {showAllBuyapar ? 'Daralt' : 'Tümünü Gör'} ({buyaparActions.length}) <ChevronRight className={`w-4 h-4 transition-transform ${showAllBuyapar ? 'rotate-90' : ''}`} />
             </button>
           </div>
         </div>
@@ -560,7 +560,7 @@ export default function IntegrationsPage() {
         </div>
       </div>
 
-      {/* Buyapar Action Modal */}
+      {/* UYAP Hızlı İşlem Modal */}
       {selectedAction && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
@@ -585,7 +585,7 @@ export default function IntegrationsPage() {
                 <div className="flex flex-col items-center justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-orange-500 mb-3" />
                   <p className="text-sm text-slate-500">UYAP'a bağlanılıyor...</p>
-                  <p className="text-xs text-slate-400 mt-1">Buyapar üzerinden işlem yürütülüyor</p>
+                  <p className="text-xs text-slate-400 mt-1">UYAP üzerinden işlem yürütülüyor</p>
                 </div>
               ) : actionResults ? (
                 <div className="space-y-3">
