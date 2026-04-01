@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createToken, getTokenCookieOptions } from '@/lib/auth';
 
 const DEMO_USERS = [
-  { id: 1, email: 'admin@lawara.co', password: 'admin123', name: 'Talip Furkan Doğan', role: 'admin' },
-  { id: 2, email: 'demo@lawara.co', password: 'demo123', name: 'Demo Kullanıcı', role: 'user' },
+  { id: 1, email: 'talipfurkan@lawara.co', password: 'admin123', name: 'Talip Furkan Doğan', role: 'admin' },
+  { id: 2, email: 'admin@lawara.co', password: 'admin123', name: 'Talip Furkan Doğan', role: 'admin' },
+  { id: 3, email: 'yuksel@lawara.co', password: 'user123', name: 'Yüksel Martı', role: 'user' },
+  { id: 4, email: 'demo@lawara.co', password: 'demo123', name: 'Demo Kullanıcı', role: 'user' },
 ];
 
 export async function POST(request: NextRequest) {
